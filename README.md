@@ -1,2 +1,5 @@
-# 2021_Bioinformatics_Research_Experience
-Repository for Coriell Institute's 2021 Bioinformatics Research Experience
+![Coriell Bioinformatics Research Experience Logo](coriell_bre_logo_final.png)
+
+# Coriell Bioinformatics Research Experience 2021
+
+
