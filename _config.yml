@@ -1,5 +1,5 @@
 theme: jekyll-theme-minimal
-site.name: test
+#site.name: test
 #title-heading: false
-#title: null
+title: false
 logo: coriell_BRE_logo_final.png
