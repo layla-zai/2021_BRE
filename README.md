@@ -8,13 +8,14 @@ The Bioinformatics Research Experience is a four-week research training program 
 
 ## Schedule
 
-![calendar]()
+![calendar](daily_schedule.png)
 
 <br>
 
-- [Full Calendar]()
+### 
+
 - [Daily Lecture Topics]()
-- [Speaker List]()
+- [Speaker List](https://docs.google.com/spreadsheets/d/1zB7tjQF1Xtp6KgiZ6rR0qtcah-rLtHwZUWlpgb7APEc/edit?usp=sharing)
 
 ---
 
@@ -36,7 +37,7 @@ The Bioinformatics Research Experience is a four-week research training program 
 
 - Introduction to Coriell and Coriell's Bioinformatics Research Experience
 - Introduction to Rmarkdown and RStudio
-<!-- - [slides](R/2021-07-06_introduction_BRE_rmarkdown/2021-07-06_introduction_BRE_rmarkdown.pdf) -->
+- [slides](R/2021-07-06_introduction_BRE_rmarkdown/2021-07-06_introduction_BRE_rmarkdown.pdf)
 
 <br>
 
