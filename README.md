@@ -10,9 +10,7 @@ The Bioinformatics Research Experience is a four-week research training program 
 
 ![calendar](daily_schedule.png)
 
-<br>
-
-#### Talks and Lectures
+#### Talks and Lecture Topics
 
 - [Daily Lecture Topics](https://docs.google.com/spreadsheets/d/1NnAIafN6x1MkCAhuXARa-80PsDZWWSrKE3W4T8rdy_U/edit?usp=sharing)
 - [Speaker List](https://docs.google.com/spreadsheets/d/1zB7tjQF1Xtp6KgiZ6rR0qtcah-rLtHwZUWlpgb7APEc/edit?usp=sharing)
