@@ -1,0 +1,167 @@
+---
+output: html_document
+---
+
+```{r setup, include = FALSE}
+# load libraries
+library(tidyverse)
+library(conflicted)
+
+# additional libraries for today
+library(viridis)
+library(magrittr)
+library(broom)
+
+# resolve package conflicts
+filter <- dplyr::filter
+select <- dplyr::select
+
+# configure knitr settings
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 2021-07-13: Statistical Tests
+
+### Practice Statistical Tests
+
+For this section, use the given statistical test to answer the question. Put the code for the statistical test in the chunk below the question and explain whether the test is positive (p-values < 0.05 are our significance threshold) or not where it says *TYPE YOUR CONCLUSION HERE*. We'll be using the built-in dataset `mtcars` for this section. Remember you can always check the built-in documentation by typing `?mtcars` in the R console
+
+---
+
+1. Using the built-in `mtcars` dataset, if you have a particular engine shape (`vs`) do you have an equal chance of having either type of transmission (`am`)? Use a chi-square test.
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+2. Using the built-in `mtcars` dataset, is there an association between the number of gears (`gear`) a car has and it's fuel efficiency (`mpg`)? Test the question using an ANOVA.
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+3. The average 18 wheeler truck has a horsepower of 400 (fact courtesy of dubious Googling). Compare this number to the data for personal vehicles in `mtcars`. Is their horsepower different from the mean 400 hp of an 18 wheeler? Use a t-test to answer the question.
+
+*TYPE YOUR CONCLUSION HERE*
+
+```{r}
+
+```
+
+4. Is there a difference in horsepower (`hp`) between cars with automatic vs manual transmissions (`am`)? Test the question using a t-test.
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+5. Using the built-in `mtcars` dataset, is there an association between the number of carburetors (`carb`) a car has and it's fuel efficiency (`mpg`)? Test the question using a linear model. Make sure to include the direction of the association in your answer.
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+### Pick the Appropriate Statistical Test
+
+In this section, you'll have to pick the appropriate statistical test to answer the question and then give your conclusion. Again, our significance level will be p < 0.05. We'll use the `wine` dataset again for this section. Use the chunk below to read it in. For reference, here is the column information again:
+
+- **Sample** = the unique sample ID for each row
+- **Cultivar** = the number factor indicating the grape cultivar the wine was made from
+- **Alcohol** = the alcohol concentration in the wine sample (g/L)
+- **MalicAcid** = the malic acid concentration in the wine sample (g/L)
+- **Ash** = the ash concentration in the wine sample (g/L)
+- **Magnesium** = the magnesium concentration in the wine sample (g/L)
+- **TotalPhenol** = the total amount of all phenol compounds in the wine sample (g/L)
+- **Flavanoids** = the concentration of all flavanoids in the wine sample (g/L)
+- **NonflavPhenols** = the concentration of all non-flavanoid phenols in the wine sample (g/L)
+- **Color** = wine color (spectrophotometric measure?)
+
+```{r}
+
+```
+
+---
+
+6. Is there an association between malic acid and flavanoid content?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+7. Is there a difference in color between cultivars 1 and 2?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+8. Is there a difference in magnesium content between the three different cultivars?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+9. Is there a difference in the average color of cultivar 3 compared the mean color of cultivar 1, 5.5?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+10. Is there a difference in ash content between the three cultivars?
+
+*TYPE YOUR CONCLUSION HERE*
+
+```{r}
+
+```
+
+### Mini Exploratory Data Analysis
+
+In this last section, we'll do some exploratory analysis on Jelle's Marble Runs. This is a YouTube channel <https://www.youtube.com/channel/UCYJdpnjuSWVOLgGT9fIzL0g> that hosts Olympic-style competitions for marbles, including the Marblelympics. (You may have seen this on Last Week Tonight with John Oliver <https://youtu.be/z4gBMw64aqk?t=1067>) The table we'll be using for this section has all the data on the results from the 2020 Marbula One competition. This section is very open-ended; the questions will guide you through the basic steps of exploratory data analysis, but there many, many different ways to answer questions 12-14.
+
+---
+
+11. Read in the marbles dataset, available at the link <https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-06-02/marbles.csv>
+
+```{r}
+
+```
+
+12. Pick a variable to explore and make a plot highlighting it using `ggplot`
+
+```{r}
+
+```
+
+13. Pick a question to answer with a statistical test. Write down both your question and the test you'll use below.
+
+**Question:** TYPE YOUR QUESTION HERE 
+**Test:** TYPE THE TEST YOU PICKED HERE 
+
+14. Use the chunk below to run your statistical test. What is your conclusion?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+
+
+<br>
+
+
