@@ -88,9 +88,10 @@ During the Bioinformatics Research Experience you will give two Journal Clubs, o
 
 ---
 
-#### **July 08:** Reading Data with `readr` and Tidying Data with `tidyr`
+#### **July 09:** Reading Data with `readr` and Tidying Data with `tidyr`
 
-- Data visualization with `ggplot2`
+- How to read data into `R` using `readr`
+- More data wrangling, tidying data with `tidyr`
 - [slides](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr.pdf)
 - demo [Rmd](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_demo.Rmd)
   - demo [data](R/2021-07-09_readr_and_tidyr/measles_vaccination_rates.tsv)
