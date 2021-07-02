@@ -40,7 +40,7 @@ The Bioinformatics Research Experience is a four-week research training program 
 
 <br>
 
-Today's Assignment: **Rmarkdown Practice** [Rmarkdown](R/2021-07-06_introduction_BRE_rmarkdown/2021-07-06_rmarkdown_assignment.Rmd) <!--, ANSWER KEY in [Rmarkdown](R/2021-07-06_introduction_BRE_rmarkdown/2021-07-06_rmarkdown_assignment_ANSWERS.Rmd) and [html](R/2021-07-06_introduction_BRE_rmarkdown/2021-07-06_rmarkdown_assignment_ANSWERS.html) 
+Today's Assignment: **Rmarkdown Practice** [Rmarkdown](R/2021-07-06_introduction_BRE_rmarkdown/2021-07-06_rmarkdown_assignment.Rmd) <!-- , ANSWER KEY in [Rmarkdown](R/2021-07-06_introduction_BRE_rmarkdown/2021-07-06_rmarkdown_assignment_ANSWERS.Rmd) and [html](R/2021-07-06_introduction_BRE_rmarkdown/2021-07-06_rmarkdown_assignment_ANSWERS.html) 
 
 ---
 
