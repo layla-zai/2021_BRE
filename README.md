@@ -76,7 +76,7 @@ During the Bioinformatics Research Experience you will give two Journal Clubs, o
 
 - Journal Club Sign Up GoogleSheet <https://docs.google.com/spreadsheets/d/1jFC24C2OL5drmgdDU9ApuyTB8uDavt9VfCs84Gnn6mg/edit?usp=sharing>
 - Examples
-  - Old Coriell journal club [slides]()
+  - Old Coriell journal club [slides](journal_club/example_slides.pdf)
   - YouTube Video <https://www.youtube.com/watch?v=xXKL9uLFHy4>
 - Papers
   - [Cani 2018](journal_club/provided_papers/cani2018_microbiome_review.pdf) Microbiome
