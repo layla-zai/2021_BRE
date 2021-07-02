@@ -62,7 +62,7 @@ Today's Assignment: **Rmarkdown Practice** [Rmarkdown](R/2021-07-07_dplyr/2021-0
 - Data visualization with `ggplot2`
 - [slides](R/2021-07-08_ggplot/2021-07-08_plotting_ggplot2.pdf)
 - demo [Rmd](R/2021-07-08_ggplot/2021-07-08_ggplot2_demo.Rmd)
-- [R Color Chart](R/2021-07-08_ggplot/)
+- [R Color Chart](R/2021-07-08_ggplot/ColorChart.pdf)
 
 <br>
 
