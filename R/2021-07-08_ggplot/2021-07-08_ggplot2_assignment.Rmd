@@ -1,0 +1,238 @@
+
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(conflicted)
+
+# resolve conflicts
+filter <- dplyr::filter
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 2021-07-08: Plotting with `ggplot2`
+
+We'll be using data from the `gapminder` package for today's assignment. The `gapminder` dataset has the following columns (if the name defines the column I didn't put a longer description): 
+
+- `country`
+- `continent` 
+- `year` 
+- `ifeExp` = the life expectancy of the population in years
+- `pop` = the population of the country
+- `gdpPercap` = gross domestic product (GDP) per capita in inflation-adjusted US dollars 
+
+You need to install and load a package to get the data, so make sure you pay attention to the set up steps and run every chunk. 
+
+### Set Up
+
+Install the package with the data
+
+```{r}
+# install.packages("gapminder")
+```
+
+Load the library.
+
+```{r}
+library(gapminder)
+```
+
+Look at the data. 
+
+```{r}
+gapminder
+```
+
+<br>
+
+### Play with the Fixed Aesthetics
+
+We're going to play around with the fixed aesthetics of the same plot
+
+---
+
+1. Change the transparency of the points
+
+```{r}
+gapminder %>%
+  filter(gdpPercap < 50000) %>%
+  
+ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent)) +
+  geom_smooth(se = F)
+```
+
+2. Make the points and/or the line a different color! A pdf of R color names is available at the link <http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf
+
+```{r}
+gapminder %>%
+  filter(gdpPercap < 50000) %>%
+  
+ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent)) +
+  geom_smooth(se = F)
+```
+
+3. You don't have to have just a boring straight lines or normal circles! Change the line to a different type. Options at the link: <http://sape.inf.usi.ch/quick-reference/ggplot2/linetype>. Change the points to something other than circles too. <https://ggplot2.tidyverse.org/articles/ggplot2-specs_files/figure-html/unnamed-chunk-8-1.png>
+
+```{r}
+gapminder %>%
+  filter(gdpPercap < 50000) %>%
+  
+ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent)) +
+  geom_smooth(se = F)
+```
+
+4. Change the size of something on the plot! The `size` argument accepts numeric values.
+
+```{r}
+gapminder %>%
+  filter(gdpPercap < 50000) %>%
+  
+ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent)) +
+  geom_smooth(se = F)
+```
+
+5. Change the theme of the plot to something else. Options at the link: <https://ggplot2.tidyverse.org/reference/ggtheme.html>
+
+```{r}
+gapminder %>%
+  filter(gdpPercap < 50000) %>%
+  
+ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent)) +
+  geom_smooth(se = F)
+```
+
+6. Facet the plot by some feature
+
+```{r}
+gapminder %>%
+  filter(gdpPercap < 50000) %>%
+  
+ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent)) +
+  geom_smooth(se = F)
+```
+
+7. Change the x- and y- axis labels of the plot to something better
+
+```{r}
+gapminder %>%
+  filter(gdpPercap < 50000) %>%
+  
+ggplot(aes(x = gdpPercap, y = lifeExp)) +
+  geom_point(aes(color = continent)) +
+  geom_smooth(se = F)
+```
+
+### Same Data, Different Shapes, Different Geometry
+
+This section will explore how you can plot data with different geometries
+
+---
+
+For questions 8 and 9, plot the gapminder dataset with `x = continent` and `y = lifeExp`. Use any geom you would like.
+
+8. `x = continent` and `y = lifeExp` Plot 1
+
+```{r}
+ggplot(gapminder, aes(x = continent, y = lifeExp)) +
+  # geom of your choice goes here
+```
+
+9. `x = continent` and `y = lifeExp` Plot 2
+
+```{r}
+ggplot(gapminder, aes(x = continent, y = lifeExp)) +
+  # geom of your choice goes here
+```
+
+---
+
+For questions 10-12, pick one variable and plot it using a geom of your choice
+
+10. Pick one variable and plot it
+
+```{r}
+
+```
+
+11. Pick one variable and plot it
+
+```{r}
+
+```
+
+12. Pick one variable and plot it
+
+```{r}
+
+```
+
+<br>
+
+### Answer Question With Plots
+
+For this section, make an appropriate plot to answer the question.
+
+---
+
+13. What is the trend in life expectancy over time? Is it increasing or decreasing?
+
+```{r}
+
+```
+
+14. As life expectancy changes, what happens to GDP per capita?
+
+```{r}
+
+```
+
+15. Does the relationship between life expectancy and GDP per capita look the same for all continents?
+
+```{r}
+
+```
+
+16. Is the distribution of life expectancy the same over all the continents?
+
+```{r}
+
+```
+
+17. Is the relationship between life expectancy and GDP per capita the same in the first year in the `gapminder` dataset vs the last year?
+
+```{r}
+
+```
+
+18. Which country in Oceania had the greatest increase in life expectancy over time?
+
+```{r}
+
+```
+
+19. What's the difference in population between the countries of Oceania in the 21st century?
+
+```{r}
+
+```
+
+20. For countries starting with 'B', how has their GDP per capita changed over time?
+
+```{r}
+
+```
+
+
+
+<br><br>
+
+

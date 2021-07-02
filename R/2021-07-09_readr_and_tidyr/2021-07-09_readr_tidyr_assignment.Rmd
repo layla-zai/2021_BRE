@@ -1,0 +1,243 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(conflicted)
+library(vroom)
+
+### resolve conflicts
+filter <- dplyr::filter
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 2021-07-09: `readr` and `tidyr`
+
+### Basics of tidying using `tidyr` with the `who` data
+
+We'll use the dataset `who` for a tidying challenge this week! It's in the tidyr package for practice and gives World Health Organization data on tuberculosis (TB) cases. The following chunks guide you through the process of tidying a data table. So for each question, you'll need to either copy/paste the previous chunk into the next chunk to continue piping (preferred method) or assign the result to an object and use that objec in the next chunk. 
+
+#### The Data
+
+Before doing anything else, take a look at the `who` table. What do you see that's not tidy? Try and list them yourself before looking at the answers below.
+
+```{r}
+
+```
+
+Some reasons the table isn't tidy/feature of the table you should pay attention to are:
+
+- The columns country, iso2, and iso3 look like they all specify the country, so they're redundant, but the columns are all single variables, which is tidy.
+- The year column is also a variable, so this column is tidy!
+- The columns new_sp_m014 to newrel_f65 look like they're values, not variables, because they have a repeated structure. They also look like they contain multiple values withing them that will need to be separated out later.
+- There are a ton of NAs that will need to be either dropped or replaced.
+
+#### Drop columns
+
+First, take care of the easiest tidying step and drop the redundant iso2 and iso3 columns.
+
+```{r}
+
+```
+
+#### Gather columns
+
+We decided earlier that the columns new_sp_m014 to newrel_f65 are values of the same variable(s) so use `pivot_longer()` to gather them together into two columns. Name your two new columns "code" and "count" (or whatever you want to call the new columns, but they'll be referred to as code and count downstream)
+
+```{r}
+
+```
+
+So what does the text in the code column mean? Thankfully, because this is a built-in dataset, you can find out by typing `?who` into the console. But what about in real life? Well you might have to talk to whoever generated the data, or find the data dictionary or read the documentation for a tool that generated a table or figure it out yourself or some combination of all of these. 
+
+But here's what our data in the code column means:
+
+1. The first three letters tell you whether the case of tuberculosis was a new or old case of TB.
+2. The letters in between underscores give diagnostic information about the TB case.
+3. The letter immediately after the second underscore gives the sex of the patient
+4. The numbers at the end give the age group of the patient.
+
+#### Separate columns
+
+##### Separate
+
+So we're going to need to split this column into four columns. First, separate the code column by underscores, ('_') into three new columns, "case_type", "diag_type", and "sexage."
+
+```{r}
+
+```
+
+##### Check results
+
+You should have gotten a warning about missing pieces. That probably means that not all the stuff in the code column you just split up had the same format. The easiest way to check the new columns is by identifying the distinct entries in them. 
+
+```{r}
+
+```
+
+When you run the code in the chunk above, you can see that you didn't just get 'new' or 'old' in the case_type column, you got 'new' or 'newrel'. One section of text in the code column must not have had two underscores, so we'll need to go back redo our separate eventually. But before we do that, use the next two chunks to check the "diag_type" and "sexage" columns.
+
+Check "diag_type" column in this chunk.
+
+```{r}
+
+```
+
+And check the "sexage" column in this chunk.
+
+```{r}
+
+```
+
+You should have seen a mix of values belonging to the different variables in the diag_type and sexage columns. This is because code wasn't split properly. If we go back and split code correctly, that should fix the problem. 
+##### Fix the problem
+
+Because the missing underscore problem is complicated and hasn't been covered so far, use this mutate command `mutate(code = stringr::str_replace(code, 'newrel', 'new_rel'))` **BEFORE** you `separate()` to fix the problem in the chunk below.
+
+```{r}
+
+```
+
+##### Check results
+
+You shouldn't have gotten any errors this time, but just to make sure, in the three chunks below, check the case_type, diag_type, and sexage columns again using the same `group_by()` and `count()` method.
+
+Check the case_type column here.
+
+```{r}
+
+```
+
+Check the diag_type column here.
+
+```{r}
+
+```
+
+Check the sexage column here.
+
+```{r}
+
+```
+
+##### Drop column
+
+All the columns should look good now! Their values all belong to the variable indicated in the column name. However, the case_type column only has 'new' in it. That makes this columnn unnecessary, so drop the case_type column in the chunk below.
+
+```{r}
+
+```
+
+##### Separate column again
+
+The sexage column is still a problem because it has two variables in it, sex and age. Use the chunk below to split the sexage column into two columns, "sex" and "age."
+
+```{r}
+
+```
+
+##### Check results
+
+The new sex and age columns should *theoretically* be ok, because we looked at the sexage column before splitting and know that everything was in the same format, but just to be sure, check that the values in the sex and age columns are correct using the `group_by()` and `count()` method.
+
+Check the sex column here.
+
+```{r}
+
+```
+
+Check the age column here.
+
+```{r}
+
+```
+
+They should both look good!
+
+#### Fix NAs
+
+One last problem - all those NAs in the count column! They need to be dealt with in some way. Try both methods, just dropping NAs, and replacing NAs with some reasonable value
+
+Use this chunk to practice dropping NAs
+
+```{r}
+
+```
+
+Use this chunk to replace NAs with something
+
+```{r}
+
+```
+
+The dataset should now be tidy! Make sure to save the table with the replaced NAs to a new object since you'll use the tidied `who` table in the next section.
+
+<br>
+
+### Combine the tidied `who` dataset with more data
+
+Read in the table `TTB_hiv_nonroutine_surveillance_2020-07-10.csv` and combine it with the `who` table. The data dictionary is available in the `data/` folder if you need an explanation of the column names.
+
+---
+
+Read in the  HIV surveillance table.
+
+```{r}
+
+```
+
+Combine it with the tidied who table.
+
+```{r}
+
+```
+
+<br>
+
+## Combining Skills: Answer Questions About Data
+
+Read in the `measles` data set at the link and answer the following questions.
+
+```{r}
+
+```
+
+---
+
+1. Which state has the lowest average percentage of MMR vaccinations?
+
+```{r}
+
+```
+
+2. What's the average percentage of students exempted from vaccination for each of California's counties?
+
+```{r}
+
+```
+
+3. What's the year to year change in average vaccination rates?
+
+```{r}
+
+```
+
+4. What's the difference in distribution between the three reasons for exemption from vaccination?
+
+```{r}
+
+```
+
+5. What's the breakdown of average student enrollment by type of school per state?
+
+```{r}
+
+```
+
+
+
+<br><br>
+
+

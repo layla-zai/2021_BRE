@@ -14,6 +14,17 @@ This is an (R)markdown document. Markdown is a plain-text format that allows bot
 
 ## RStudio
 
+### .RData
+
+Go to Tools > Global Options. In the window that pops up under **Workspace**, uncheck "Restore .RData into workspace at startup" and set "Save workspace to .RData on exit:" to **Never**
+
+### Tour
+
+- Source
+- Console
+- Environment/History
+- Files/Plots/Packages/Help
+
 <br>
 
 ## Rmarkdown
@@ -113,6 +124,10 @@ You can add inline code with single backticks (\`) around it, ex: `head(iris)`. 
 You can make a link with square brackets [] followed by parentheses (), with the link text in the brackets and the link address in the parentheses.
 
 [All the material for the class is here](https://2020-coriell-bre.github.io/2020_Bioinformatics_Research_Experience/)
+
+---
+
+If you want to link to a picture, you use an exclamation point in front of the square brackes, like ![bre_logo](coriell_BRE_logo_final.png)
 
 <br>
 
