@@ -14,6 +14,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Assignment 2021-07-07: Data Manipulation with `dplyr`
 
+Please email me your Rmarkdown document as <kkeith@coriell.org> by 9AM Friday 7/9
+
+---
+
 We'll be using data from the `coronavirus` package for today's assignment. The `coronavirus` dataset has the following columns: 
 
 - `date` = The date of the summary

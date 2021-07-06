@@ -3,3 +3,6 @@
 *.pptx
 temp.md
 *.docx
+
+### folders to ignore
+**/graded_homework
