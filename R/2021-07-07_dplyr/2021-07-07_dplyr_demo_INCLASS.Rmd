@@ -1,0 +1,352 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(conflicted)
+
+### resolve conflicts
+filter <- dplyr::filter
+
+knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 4)
+```
+
+# Tidy Data Wrangling with `dplyr`
+
+`dplyr` is a grammar of data manipulation, providing a consistent set of rationally named functions to help you solve the most common data manipulation challenges.
+
+<br>
+
+## Subsetting Data in Base `R`
+
+### Tables and Examing Data
+
+```{r}
+iris
+```
+
+`head()` and `tail()`
+
+```{r}
+# look at the first 6 rows
+head(iris)
+
+# look at the first 10 rows
+head(iris, 10)
+
+# look at the last 6 rows
+tail(iris)
+```
+
+`dim()` prints the numbers of rows and columns in a table
+
+```{r}
+# rows, columns
+dim(iris)
+```
+
+### Subsetting Tables with Base R
+
+Square brackets `[]`
+
+```{r}
+iris[1,]
+
+iris[,1]
+
+iris[1,1] %>% class()
+```
+
+Dollar sign subsetting `$`
+
+```{r}
+iris$Sepal.Length
+```
+
+More advanced subsetting
+
+```{r}
+# drop the first column
+iris[,-1]
+
+# select rows 1 to 5 and columns 2 to 4
+iris[1:5,2:4]
+
+# list the exact rows and columns you want
+iris[c(37, 49, 132, 12, 77), c(1, 3)]
+
+# value doesn't exist return NA
+iris[c(37, 49, 132, 12, 77, 200), c(1, 3)]
+```
+
+### Logicals
+
+These operators are how you compare values to each other. Keep them in mind for subsetting and filtering going forward.
+
+- equals `==`
+- not equal to `!=`
+- greater than `>`
+- greater than or equal to `>=`
+- less than `<`
+- less than or equal to `<=`
+- and `&`
+- or `|`
+
+```{r}
+# Are the numbers equal?
+2 == 5
+2 = 5
+assigned = 5
+
+2 != 5
+
+# Is the first number less than the second number?
+2 < 5
+
+# Is the first number greater than the second number?
+2 > 5
+
+# Are the numbers NOT equal
+2 != 5
+
+2 == 5 & 5 == 5
+2 == 5 | 5 == 5
+```
+
+Subset tables with logicals
+
+```{r}
+# get all columns and all rows where sepal length is greater than or equal to 5
+iris[iris$Sepal.Length >= 5,]
+
+# get all columns and all rows species is NOT viriginica
+iris[iris$Species != 'virginica',] %>% tail()
+```
+
+### Piping
+
+The pipe operator `%>%` pipes output from one function to the next. You can use this to chain together as many command/functions as desired. For a simple example, instead of calling `head()` on flights, we could have piped flights to `head()`
+
+```{r}
+iris %>% head()
+```
+
+You can chain as many pipes as you want together and you can also pipe into `ggplot()`
+
+```{r}
+iris %>% filter(Species == 'setosa') %>% select(Sepal.Length, Sepal.Width)
+```
+
+### Assignment
+
+The assignment operator, `->` saves the current output as an object (aka a data structure) to whatever name you pick. You can save data of any format this way.
+
+```{r}
+iris %>% filter(Species == 'setosa') %>% select(Sepal.Length, Sepal.Width) -> new_iris
+
+new_iris
+```
+
+<br>
+
+## Data Manipulation with dplyr
+
+### Setup
+
+Install packages
+
+```{r}
+# uncomment the packages and install
+# install.packages('tidyverse')
+# install.packages('conflicted')
+
+# if the packages aren't loaded run the topmost chunk in this document
+```
+
+### dplyr functions
+
+#### `arrange()`
+
+The `arrange()` function allows you to sort the data by some criteria, usually another column in the data. 
+
+```{r}
+### Before arranging the data, let's remember what it looks like
+iris
+
+### arrange() takes, at a minimum, a single column as an argument. It will sort
+### the table by that column in order from least to greatest
+iris %>%
+  arrange(Petal.Width)
+
+### You can sort the data by as many columns as you like, although the changes
+### in the order are smaller with each additional column
+iris %>%
+  arrange(Petal.Width, Petal.Length, Sepal.Length)
+
+### What if you want to sort from largest to smallest? You can use the helper
+### function desc() that changes the sort order from largest to smallest.
+iris %>%
+  arrange(desc(Petal.Width))
+
+iris %>%
+  arrange(desc(Species))
+```
+
+### `select()`
+
+The `select()` function allows you to pick only the columns you want
+
+```{r}
+### For the select() function, you just give it the names of the columns you 
+### want. For more complicated selection criteria, you probably need to use 
+### select_if() or select_at() which are beyond the scope of this presentation.
+iris %>%
+  select(Species, Sepal.Length, Sepal.Width)
+
+iris %>%
+  select(Petal.Length:Species) -> select_example
+select_example
+
+iris %>%
+  select(species = Species, sepal_length = Sepal.Length, sepal_width = Sepal.Width)
+
+iris %>%
+  rename(species = Species, sepal_length = Sepal.Length, sepal_width = Sepal.Width)
+```
+
+### `filter()`
+
+The function `filter()` allows you select a subset of the data according to some criteria. This could be by matching a variable like `sample == 's42'` or could be base on some numberic value like `Sepal.Width < 3 | Sepal.Width > 4`
+
+```{r}
+### filter takes that name of the column you want to filter on and some 
+### logical condition. Here, we'll get only the rows of the table for samples
+### with Sepal.Lengths greater than 4.5 cms.
+iris %>%
+  filter(Sepal.Length > 5.5, Species == 'setosa')
+
+iris %>%
+  filter(Sepal.Length > 5.5 | Species == 'setosa')
+
+### You can filter by as many things as you want
+iris %>%
+  filter(Sepal.Length > 4.5, Species %in% c('virginica', 'versicolor'), 
+         Sepal.Width < 3, Petal.Length > 5, Petal.Width > 1.5)
+```
+
+### `distinct()`
+
+The function `distinct()` gives you all unique values of a given variable.
+
+```{r}
+### distinct() takes the name of the column you want the distinct values of
+iris %>%
+  distinct(Sepal.Width)
+
+iris %>%
+  distinct(Species)
+
+### You can give it as many columns as you want although it becomes less and
+### less useful as you add columns
+iris %>%
+  distinct(Species, Sepal.Width)
+```
+
+### `mutate()`
+
+The function `mutate()` adds an additional column onto the table.
+
+```{r}
+iris %>%
+### mutate() needs the name of the new column equal to whatever will go in the
+### new column. Frequently that will be a logical statement based on other
+### data in the table, like in this example where we call any iris with a sepal
+### length less than 5.8 cm small and all the other irises large
+  mutate(flower_size = ifelse(Sepal.Length < 5.8, 'small', 'large'))
+
+### You can make more than one column in the same mutate call. If you supply a
+### single value, it will be used for all rows (recycled).
+iris %>%
+  mutate(flower_size = ifelse(Sepal.Length < 5.8, 'small', 'large'),
+         second_column = 'BRE')
+
+iris %>%
+  mutate(flower_size = case_when(Sepal.Length < 3 ~ 'small',
+                                 Sepal.Length >= 3 & Sepal.Length < 6 ~ 'medium',
+                                 TRUE ~ 'large')) %>%
+  distinct(Sepal.Length, flower_size) %>% arrange(Sepal.Length)
+```
+
+### `summarize()`
+
+Lets you reduce the data down to some summary statistics or other summary function
+
+```{r}
+### summarize() works similarly to mutate(), but instead of adding an 
+### additional column with an entry for all rows, it will reduce to the number
+### summaries you asked for. Like mutate(), summarize() needs the name of the
+### summary column equal to the calculation you're making. Here, we'll make the
+### summary column "average" which is equal to the mean of the petal lengths
+iris %>%
+  summarize(average = mean(Petal.Length))
+
+### For most tidyverse functions, either the British or American spellings can
+### be used. Frequently the British spelling comes up by default because Hadley
+### Wickham is from New Zealand.
+iris %>%
+  summarise(average = mean(Petal.Length))
+
+### summarize() is very powerful when used with group_by(). group_by() causes 
+### all functions later in the pipeline to be applied over the specified group
+iris %>%
+  group_by(Species) %>%
+  summarize(average = mean(Petal.Length))
+
+### Don't forget to ungroup() because grouping will mess up your code later
+iris %>%
+  group_by(Species) %>%
+  summarize(average = mean(Petal.Length)) %>%
+  ungroup()
+
+mean(iris$Petal.Length)
+
+### You can calculate more than one summary at a time as long as they (for the
+### moment) have a single thing as their output
+iris %>%
+  group_by(Species) %>%
+  summarize(avg_pl = mean(Petal.Length),
+            avg_pw = mean(Petal.Width),
+            sd_pl = sd(Petal.Length),
+            sd_pw = sd(Petal.Width)) %>%
+  ungroup()
+```
+
+#### `count()`
+
+The function `count()` is like a special case of `summarize()`, but all it does is count the number of distinct things in the column(s).
+
+```{r}
+### count() takes the name of the column you want
+iris %>%
+  count(Species)
+
+### It's particularly powerful when combined with group_by(), like summarize() is
+iris %>%
+  mutate(flower_size = ifelse(Sepal.Length < 5.8, 'small', 'large')) %>%
+  group_by(flower_size) %>%
+  count(Species) %>%
+  ungroup() %>%
+  arrange(Species)
+
+### You can also count() multiple things at once
+iris %>%
+  mutate(flower_size = ifelse(Sepal.Length < 5.8, 'small', 'large')) %>%
+  count(Species, flower_size)
+```
+
+```{r}
+iris %>%
+  filter(Sepal.Length > 4)
+```
+
