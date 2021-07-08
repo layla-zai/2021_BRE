@@ -15,6 +15,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Assignment 2021-07-09: `readr` and `tidyr`
 
+Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the filename by 9AM Wednesday 7/14
+
+---
+
 ### Basics of tidying using `tidyr` with the `who` data
 
 We'll use the dataset `who` for a tidying challenge this week! It's in the tidyr package for practice and gives World Health Organization data on tuberculosis (TB) cases. The following chunks guide you through the process of tidying a data table. So for each question, you'll need to either copy/paste the previous chunk into the next chunk to continue piping (preferred method) or assign the result to an object and use that objec in the next chunk. 

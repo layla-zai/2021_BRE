@@ -31,6 +31,26 @@ The Bioinformatics Research Experience is a four-week research training program 
 
 ## BRE Material
 
+### Journal Club
+
+During the Bioinformatics Research Experience you will give two Journal Clubs, one on one of the papers listed below and the other on a paper of your choosing. Your choice of second paper is due by Friday, 7/16.
+
+- Journal Club Sign Up GoogleSheet <https://docs.google.com/spreadsheets/d/1jFC24C2OL5drmgdDU9ApuyTB8uDavt9VfCs84Gnn6mg/edit?usp=sharing>
+- Examples
+  - Old Coriell journal club [slides](journal_club/example_slides.pdf)
+  - YouTube Video <https://www.youtube.com/watch?v=xXKL9uLFHy4>
+- Papers
+  - [Cani 2018](journal_club/provided_papers/cani2018_microbiome_review.pdf) Microbiome
+  - [Greenberg 2019](journal_club/provided_papers/greenberg2019_methylation_review.pdf) Methylation
+  - [Kazazian 2017](journal_club/provided_papers/kazazian2017_mobile_DNA_in_health_and_disease.pdf) Repetitive/Transposable Elements
+  - [Klemm 2019](journal_club/provided_papers/klemm2019_chromatin_accessibility_review.pdf) Chromation Accessibility
+  - [Stark 2019](journal_club/provided_papers/stark2019_RNAseq_review.pdf) RNA-seq
+  - [Tang 2019](journal_club/provided_papers/tang2019_single_cell_review.pdf) Single Cell Sequencing
+
+---
+
+### Daily Lecture Material
+
 #### **July 06:** Welcome and Introduction to Rmarkdown and RStudio
 
 - Introduction to Coriell and Coriell's Bioinformatics Research Experience
@@ -61,7 +81,7 @@ Today's Assignment: **Data Wrangling** [Rmarkdown](R/2021-07-07_dplyr/2021-07-07
 
 - Data visualization with `ggplot2`
 - [slides](R/2021-07-08_ggplot/2021-07-08_plotting_ggplot2.pdf)
-- demo [Rmd](R/2021-07-08_ggplot/2021-07-08_ggplot2_demo.Rmd)
+- demo [Rmd](R/2021-07-08_ggplot/2021-07-08_ggplot2_demo.Rmd) and demo [Rmd with in class additions](R/2021-07-08_ggplot/2021-07-08_ggplot2_demo_INCLASS.Rmd)
 - [R Color Chart](R/2021-07-08_ggplot/ColorChart.pdf)
 
 <br>
@@ -69,19 +89,15 @@ Today's Assignment: **Data Wrangling** [Rmarkdown](R/2021-07-07_dplyr/2021-07-07
 Today's Assignment: **Data Visualization** [Rmarkdown](R/2021-07-08_ggplot/2021-07-08_ggplot2_assignment.Rmd)
 
 ---
+  
+#### **July 09:** Reading Data with `readr` and Tidying Data with `tidyr`
 
-#### Journal Club
+- How to read data into `R` using `readr`
+- More data wrangling, tidying data with `tidyr`
+- [slides](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr.pdf)
+- demo [Rmd](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_demo.Rmd)
+  - demo [data](R/2021-07-09_readr_and_tidyr/measles_vaccination_rates.tsv)
 
-During the Bioinformatics Research Experience you will give two Journal Clubs, one on one of the papers listed below and the other on a paper of your choosing. Your choice of second paper is due by Friday, 7/16.
+<br>
 
-- Journal Club Sign Up GoogleSheet <https://docs.google.com/spreadsheets/d/1jFC24C2OL5drmgdDU9ApuyTB8uDavt9VfCs84Gnn6mg/edit?usp=sharing>
-- Examples
-  - Old Coriell journal club [slides](journal_club/example_slides.pdf)
-  - YouTube Video <https://www.youtube.com/watch?v=xXKL9uLFHy4>
-- Papers
-  - [Cani 2018](journal_club/provided_papers/cani2018_microbiome_review.pdf) Microbiome
-  - [Greenberg 2019](journal_club/provided_papers/greenberg2019_methylation_review.pdf) Methylation
-  - [Kazazian 2017](journal_club/provided_papers/kazazian2017_mobile_DNA_in_health_and_disease.pdf) Repetitive/Transposable Elements
-  - [Klemm 2019](journal_club/provided_papers/klemm2019_chromatin_accessibility_review.pdf) Chromation Accessibility
-  - [Stark 2019](journal_club/provided_papers/stark2019_RNAseq_review.pdf) RNA-seq
-  - [Tang 2019](journal_club/provided_papers/tang2019_single_cell_review.pdf) Single Cell Sequencing
+Today's Assignment: **Reading in and Tidying Data** [Rmarkdown](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_assignment.Rmd) and the [data](R/2021-07-09_readr_and_tidyr/data.zip)
