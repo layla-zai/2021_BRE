@@ -189,7 +189,7 @@ Read in the table `TTB_hiv_nonroutine_surveillance_2020-07-10.csv` and combine i
 Read in the  HIV surveillance table.
 
 ```{r}
-
+read_csv('TTB_hiv_nonroutine_surveillance_2020-07-10.csv')
 ```
 
 Combine it with the tidied who table.
@@ -205,7 +205,8 @@ Combine it with the tidied who table.
 Read in the `measles` data set at the link and answer the following questions.
 
 ```{r}
-
+read_csv("https://raw.githubusercontent.com/WSJ/measles-data/master/all-measles-rates.csv") %>%
+  select(-index) -> measles
 ```
 
 ---

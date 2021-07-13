@@ -23,7 +23,7 @@ select <- dplyr::select
 knitr::opts_chunk$set(echo = TRUE, fig.width = 6, fig.height = 4)
 ```
 
-## 2020-07-15 Clustering Methods in R 
+## 2020-07-14 Clustering Methods in R 
 
 ### Setup
 
