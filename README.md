@@ -128,7 +128,7 @@ Today's Assignment: **Statistics and broom** [Rmarkdown](R/2021-07-13_statistics
   - kmeans clustering
   - hierarchical clustering with heatmaps
   - Principal Component Analysis (PCA)
-- [slides](R/2021-07-14_clustering/2020-07-15_clustering.pdf)
+- [slides](R/2021-07-14_clustering/2021-07-14_clustering.pdf)
 - demo [Rmd](R/2021-07-14_clustering/2021-07-13_clustering_demo.Rmd)
 
 <br>
