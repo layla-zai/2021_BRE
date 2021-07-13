@@ -20,7 +20,11 @@ select <- dplyr::select
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Assignment 2020-07-15: Clustering
+## Assignment 2021-07-14: Clustering
+
+Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the file name by 9AM Friday 7/15
+
+---
 
 We'll practice clustering with 3 different datasets
 

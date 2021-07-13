@@ -97,8 +97,8 @@ Today's Assignment: **Data Visualization** [Rmarkdown](R/2021-07-08_ggplot/2021-
 - How to read data into `R` using `readr`
 - More data wrangling, tidying data with `tidyr`
 - [slides](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr.pdf)
-- demo [Rmd](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_demo.Rmd)
-  - demo [data](R/2021-07-09_readr_and_tidyr/measles_vaccination_rates.tsv) and demo [Rmd with in class additions](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_demo_INCLASS.Rmd)
+- demo [Rmd](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_demo.Rmd) and demo [Rmd with in class additions](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_demo_INCLASS.Rmd)
+  - demo [data](R/2021-07-09_readr_and_tidyr/measles_vaccination_rates.tsv)
 
 <br>
 
@@ -114,8 +114,23 @@ Today's Assignment: **Reading in and Tidying Data** [Rmarkdown](R/2021-07-09_rea
   - ANOVA
 - Transforming R test results into tidy tables with `broom`
 - [slides](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_review.pdf)
-- demo [Rmd](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_demo.Rmd)
+- demo [Rmd](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_demo.Rmd) and demo [Rmd with in class additions](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_demo_INCLASS.Rmd)
 
 <br>
 
 Today's Assignment: **Statistics and broom** [Rmarkdown](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_assignment.Rmd) and the [data](R/2021-07-13_statistics_review_broom/data.zip)
+
+---
+
+#### **July 14:** Clustering Data
+
+- Clustering
+  - kmeans clustering
+  - hierarchical clustering with heatmaps
+  - Principal Component Analysis (PCA)
+- [slides](R/2021-07-14_clustering/2020-07-15_clustering.pdf)
+- demo [Rmd](R/2021-07-14_clustering/2021-07-13_clustering_demo.Rmd)
+
+<br>
+
+Today's Assignment: **Clustering** [Rmarkdown](R/2021-07-14_clustering/2021-07-14_clustering_assignment.Rmd) and the [data](R/2021-07-14_clustering/data.zip)
