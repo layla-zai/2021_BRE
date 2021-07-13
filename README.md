@@ -73,7 +73,7 @@ Today's Assignment: **Rmarkdown Practice** [Rmarkdown](R/2021-07-06_introduction
 
 <br>
 
-Today's Assignment: **Data Wrangling** [Rmarkdown](R/2021-07-07_dplyr/2021-07-07_dplyr_assignment.Rmd)
+Today's Assignment: **Data Wrangling** [Rmarkdown](R/2021-07-07_dplyr/2021-07-07_dplyr_assignment.Rmd), ANSWER KEY in [Rmarkdown](R/2021-07-07_dplyr/2021-07-07_dplyr_assignment_ANSWERS.Rmd)
 
 ---
 
@@ -82,11 +82,13 @@ Today's Assignment: **Data Wrangling** [Rmarkdown](R/2021-07-07_dplyr/2021-07-07
 - Data visualization with `ggplot2`
 - [slides](R/2021-07-08_ggplot/2021-07-08_plotting_ggplot2.pdf)
 - demo [Rmd](R/2021-07-08_ggplot/2021-07-08_ggplot2_demo.Rmd) and demo [Rmd with in class additions](R/2021-07-08_ggplot/2021-07-08_ggplot2_demo_INCLASS.Rmd)
-- [R Color Chart](R/2021-07-08_ggplot/ColorChart.pdf)
+- Resources
+  - R Graph Gallery <https://www.r-graph-gallery.com/>
+  - [R Color Chart](R/2021-07-08_ggplot/ColorChart.pdf)
 
 <br>
 
-Today's Assignment: **Data Visualization** [Rmarkdown](R/2021-07-08_ggplot/2021-07-08_ggplot2_assignment.Rmd)
+Today's Assignment: **Data Visualization** [Rmarkdown](R/2021-07-08_ggplot/2021-07-08_ggplot2_assignment.Rmd), ANSWER KEY in [Rmarkdown](R/2021-07-08_ggplot/2021-07-08_ggplot2_assignment_ANSWER_KEY.Rmd) 
 
 ---
   
@@ -96,8 +98,24 @@ Today's Assignment: **Data Visualization** [Rmarkdown](R/2021-07-08_ggplot/2021-
 - More data wrangling, tidying data with `tidyr`
 - [slides](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr.pdf)
 - demo [Rmd](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_demo.Rmd)
-  - demo [data](R/2021-07-09_readr_and_tidyr/measles_vaccination_rates.tsv)
+  - demo [data](R/2021-07-09_readr_and_tidyr/measles_vaccination_rates.tsv) and demo [Rmd with in class additions](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_demo_INCLASS.Rmd)
 
 <br>
 
 Today's Assignment: **Reading in and Tidying Data** [Rmarkdown](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_assignment.Rmd) and the [data](R/2021-07-09_readr_and_tidyr/data.zip)
+
+---
+
+#### **July 13:** Statistics Review and Tidying R Statistical Tests with `broom`
+
+- Basic Statistical Tests
+  - t-test
+  - chi-square
+  - ANOVA
+- Transforming R test results into tidy tables with `broom`
+- [slides](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_review.pdf)
+- demo [Rmd](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_demo.Rmd)
+
+<br>
+
+Today's Assignment: **Statistics and broom** [Rmarkdown](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_assignment.Rmd) and the [data](R/2021-07-13_statistics_review_broom/data.zip)

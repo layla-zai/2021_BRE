@@ -22,6 +22,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Assignment 2021-07-13: Statistical Tests
 
+Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the filename by 9AM Thursday 7/15
+
 ### Practice Statistical Tests
 
 For this section, use the given statistical test to answer the question. Put the code for the statistical test in the chunk below the question and explain whether the test is positive (p-values < 0.05 are our significance threshold) or not where it says *TYPE YOUR CONCLUSION HERE*. We'll be using the built-in dataset `mtcars` for this section. Remember you can always check the built-in documentation by typing `?mtcars` in the R console
