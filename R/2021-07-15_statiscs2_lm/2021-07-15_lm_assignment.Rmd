@@ -1,0 +1,177 @@
+---
+title: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# load libraries
+library(tidyverse)
+library(conflicted)
+
+# additional libraries for today
+library(viridis)
+library(magrittr)
+library(broom)
+
+# resolve package conflicts
+filter <- dplyr::filter
+select <- dplyr::select
+
+# configure knitr settings
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2021-07-15: Linear Models 2, 2 Fast 2 Furious
+
+Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the filename by 9AM Tuesday 7/20
+
+---
+
+### Read In Data 
+
+Read in the table `insurance.tsv` that came along with the homework. This is a dataset from kaggle, <https://www.kaggle.com/mirichoi0218/insurance>, a great website that has a ton of open access data sets that you can use. This data has insurance costs for individuals, along with some demographic and health information on them. The columns are:
+
+- **age**: age of primary beneficiary
+- **sex**: insurance contractor gender, female, male
+- **bmi**: Body mass index, providing an understanding of body, weights that are relatively high or low relative to height, objective index of body weight (kg / m ^ 2) using the ratio of height to weight, ideally 18.5 to 24.9
+- **children**: Number of children covered by health insurance / Number of dependents
+- **smoker**: Smoking, yes/no
+- **region**: the beneficiary's residential area in the US, northeast, southeast, southwest, northwest.
+- **charges**: Individual medical costs billed by health insurance
+
+```{r}
+### read the data in here
+
+```
+
+<br>
+
+### Practice New Correlation and Linear Model Tests
+
+For this section, use the given statistical test to answer the question and return a `tidy()` table as the a. Put the code for the statistical test in the chunk below the question and explain whether the test is positive (p-values < 0.05 are our significance threshold) or not where it says *TYPE YOUR CONCLUSION HERE*. Remember if you're using more than one variable to include your conclusions for all of them. In addition to the statistical test, before answering each question in this section, you must do a Q-Q plot to check the linearity of all the relevant variables.
+
+---
+
+1. Is age correlated with insurance charges? Use a correlation test.
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+### Q-Q plot
+
+### test
+
+```
+
+2. Is age associated with both bmi and the number of children an individual has? Use an additive linear model
+
+*TYPE YOUR CONCLUSION HERE*
+
+```{r}
+### Q-Q plot
+
+### test
+
+```
+
+3. Is an interaction between age and bmi associated with higher insurance charges? Use an interactive linear model.
+
+```{r}
+
+```
+
+4. Reconsidering the question from 3, are there unique interactive and additive effects from age and bmi on insurance charges? Use a single linear model that checks all additive and interaction effects.
+
+```{r}
+
+```
+
+<br>
+
+### Use Model Results to Make a Prediction
+
+5. Using the model you created in question 2, read in the table `new_insurance_data.tsv` and apply your model to it to predict the age of the individuals in the table. How accurate is it?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+<br>
+
+### Which model is best?
+
+In this section you'll create a series of models, report their parameters and then have to pick the best model using the model parameters reported. We interested in seeing if age, bmi, and the number of children an individual has effects their total insurance charges.
+
+---
+
+6. Report the model parameters for the additive model
+
+```{r}
+
+```
+
+7. Report the model parameters for the interaction model
+
+```{r}
+
+```
+
+8. Report the model parameters for the combination of additive and interaction effects
+
+```{r}
+
+```
+
+9. Which model is best? Support your argument using the model parameters. Also, are these good models? Do they offer a lot of explanatory power for insurance charges?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+<br>
+
+### Come Up With Your Own Questions
+
+For this last section, come up with **three** more questions about the insurance data. For each question you'll need to both make a plot and pick an appropriate statistical test to answer it. Any test discussed in the course so far is fair game.
+
+10. Pick a question to answer with a statistical test. Write down both your question and the test you'll use below.
+
+**Question:** TYPE YOUR QUESTION HERE 
+**Test:** TYPE THE TEST YOU PICKED HERE 
+
+Use the chunk below to run your statistical test. What is your conclusion?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+11. Pick a question to answer with a statistical test. Write down both your question and the test you'll use below.
+
+**Question:** TYPE YOUR QUESTION HERE 
+**Test:** TYPE THE TEST YOU PICKED HERE 
+
+Use the chunk below to run your statistical test. What is your conclusion?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+12. Pick a question to answer with a statistical test. Write down both your question and the test you'll use below.
+
+**Question:** TYPE YOUR QUESTION HERE 
+**Test:** TYPE THE TEST YOU PICKED HERE 
+
+Use the chunk below to run your statistical test. What is your conclusion?
+
+*TYPE YOUR CONCLUSION HERE* 
+
+```{r}
+
+```
+
+
+

@@ -134,3 +134,19 @@ Today's Assignment: **Statistics and broom** [Rmarkdown](R/2021-07-13_statistics
 <br>
 
 Today's Assignment: **Clustering** [Rmarkdown](R/2021-07-14_clustering/2021-07-14_clustering_assignment.Rmd) and the [data](R/2021-07-14_clustering/data.zip)
+
+---
+
+#### **July 15:** Statistics 2: Linear Models
+
+- linear models
+  - calculation and interpretation
+  - multiple variables, both additive and interactive
+  - selecting the best model
+- [slides](R/2021-07-15_statiscs2_lm/2021-07-15_statistics2_lm.pdf)
+- demo [Rmd](R/2021-07-15_statiscs2_lm/2021-07-15_statistics2_lm_demo.Rmd)
+  - demo [data](R/2021-07-15_statiscs2_lm/wine.tsv)
+
+<br>
+
+Today's Assignment: **Linear Models** [Rmarkdown](R/2021-07-15_statiscs2_lm/2021-07-15_lm_assignment.Rmd) and the [data](R/2021-07-15_statiscs2_lm/data.zip)

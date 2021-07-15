@@ -1,0 +1,342 @@
+---
+title: ''
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# load libraries
+library(tidyverse)
+library(conflicted)
+
+# additional libraries for today
+library(broom)
+library(magrittr)
+
+# resolve package conflicts
+filter <- dplyr::filter
+select <- dplyr::select
+
+# configure knitr settings
+knitr::opts_chunk$set(echo = TRUE, fig.width = 3, fig.height = 3)
+```
+
+## 2021-07-15 Statistics 2: Advanced Linear Models and Logistic Regression
+
+More advanced statistics!
+
+### Setup
+
+#### "New" Packages
+
+You already have the `magrittr` package installed because it comes with `tidyverse`. `magrittr` is the package that contains the pipe `%>%`, but it also has specialized pipes, one of which `%$%` we'll use today.
+
+<https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html>
+
+```{r}
+library(magrittr)
+```
+
+#### Read in Data
+
+```{r}
+read_tsv('wine.tsv') -> wine
+```
+
+<br>
+
+### More Details on Linear Models
+
+#### Check for Linearity
+
+Technically, before you run a linear model, you should check that the data is linear. You should always plot your data of interest to make sure it appears linear before running a linear model, but the formal way to check for linearity is with a Q-Q plot. What this does is plot your data against the normal distribution to check if it's linear/normally distributed. You can only plot a Q-Q plot for a single variable at a time, so you should do a Q-Q plot for all variables you plan on running a linear model for.
+
+```{r}
+### theoretical ideal Q-Q plot
+# these two lines generate the perfect linear distribution
+# you don't need to know the qnorm() part for 
+qnorm(seq(0.01,0.99,0.01)) %>%
+  enframe() %>%
+# this creates the Q-Q plot
+ggplot(aes(sample = value)) +
+# this plots the points
+  geom_qq() +
+# and this plots the line indicating what a perfect relationship looks like
+  geom_qq_line()
+```
+
+Of course real data never looks this clean, so taking a look at some of wine variables we can see what good and so-so data looks like in reality
+
+```{r}
+### good
+ggplot(wine, aes(sample = Ash)) +
+  geom_qq() +
+  geom_qq_line()
+
+### ok
+ggplot(wine, aes(sample = Color)) +
+  geom_qq() +
+  geom_qq_line()
+
+### really not great
+ggplot(wine, aes(sample = MalicAcid)) +
+  geom_qq() +
+  geom_qq_line()
+```
+
+<br>
+
+#### Correlation
+
+##### What is correlation?
+
+Correlation measures the strength of the relationship between two numeric variables. It ranges from -1 to 1, where -1 is a perfect negative correlation while 1 is a perfect positive correlation. The closer your correlation is to -1 or 1 the better, while the closer you are to 0, the worse your correlation is. Below, take a look at some simulated data at various levels of correlation that we'll use for our correlation calculation examples.
+
+```{r, fig.width = 3, fig.height = 3}
+### teeny bit of variation
+# again, don't expect you to be able to simulate data
+tibble(x = seq(0.01, 1, 0.01)) %>%
+  mutate(y = x + rnorm(100, mean = 0, sd = 0.01)) -> baby_var
+# plot
+ggplot(baby_var, aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = F) +
+  theme_bw()
+
+### more variation
+tibble(x = seq(0.01, 1, 0.01)) %>%
+  mutate(y = x + rnorm(100, mean = 0, sd = 0.15)) -> mama_var
+# plot
+ggplot(mama_var, aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = F) +
+  theme_bw()
+
+### even more variation
+tibble(x = seq(0.01, 1, 0.01)) %>%
+  mutate(y = x + rnorm(100, mean = 0, sd = 0.5)) -> papa_var
+# plot
+ggplot(papa_var, aes(x = x, y = y)) +
+  geom_point() +
+  geom_smooth(method = 'lm', se = F) +
+  theme_bw()
+```
+
+##### Find Correlations
+
+If we take our simulated examples, we can use the function `cor()` to find the correlations between x and y.
+
+```{r}
+# minimal variation
+cor(baby_var$x, baby_var$y)
+
+# medium variation, you can use the %$% pipe to pipe into the function
+mama_var %$%
+  cor(x, y)
+
+# higher variation
+papa_var %$%
+  cor(x, y)
+```
+
+You can also run a formal statistical test, that gives you a p-value for the correlation using `cor.test()`
+
+```{r}
+### run a correlation test with cor.test()
+cor.test(baby_var$x, baby_var$y)
+
+### you can pipe into cor.test() as well; let's also see what the 3 broom 
+### functions do with cor.test()
+# tidy
+papa_var %$%
+  cor.test(x, y) %>%
+  tidy()
+
+# glance
+papa_var %$%
+  cor.test(x, y) %>%
+  glance()
+
+# augment; no method
+papa_var %$%
+  cor.test(x, y) %>%
+  augment()
+```
+
+<br>
+
+#### Predicting Responses
+
+When we run a linear model, we can do more than just get a p-value for the association between the two variables. It creates a **model** where we can apply to new data and get a prediction for! When you run a linear model, it can predict values of your **response** variable aka the y variable aka the first variable in the `lm()` call
+
+```{r}
+### run a model and save it to an object so we can keep using it
+# we'll be able to use it to predict Flavanoid levels
+lm(Flavanoids ~ TotalPhenol, data = wine) -> phenol_model
+
+# also, not a table, the result is class lm (aka class linear model)
+phenol_model %>% class()
+
+# And we can see that it's calculated the model for us
+phenol_model %>% tidy()
+```
+
+Now that a model's been run, we can use it to estimate the Flavanoid levels of some new data! 
+
+```{r}
+### simulated some data to predict on
+# You don't need to know how to do this
+# I've also included Flavanoids, so we have the "true" values and can see how
+# "accurate" our prediction was
+set.seed(42)
+tibble(Flavanoids = sample(1:5, 10, replace = T),
+       TotalPhenol = sample(1:5, 10, replace = T),
+       sample = paste0('n', 1:10)) -> new_data
+
+### Predict the Flavanoid levels of the new data
+# You do need to know how to do this
+new_data %>%
+# Add on a new column with our prediction, using the predict() function; it 
+# needs the model object and the new data to apply the predict to
+  mutate(flavanoid_prediction = predict(phenol_model, newdata = .)) -> predictions
+```
+
+Now that we've made some predictions, we want to check how accurate those predictions are both mathematically and visually.
+
+```{r}
+### How accurate is it?
+# Mathematically we can check the difference between the actual value and the
+# predicted value
+predictions %>%
+  mutate(diff = flavanoid_prediction - Flavanoids) %>%
+  summarize(average_error = mean(diff),
+            mean_absolute_error = mean(abs(diff)))
+
+# Can also plot the acutual vs predicted values
+ggplot(predictions, aes(x = Flavanoids, y = flavanoid_prediction)) + 
+  geom_abline(slope = 1, intercept = 0, linetype = 'dashed', color = 'gray60') +
+  geom_point() +
+  coord_cartesian(xlim = c(0,6), ylim = c(0, 6)) +
+  labs(x = 'Actual Flavanoid Value', y = 'Predicted Flavanoid Value') +
+  theme_bw()
+```
+
+<br>
+
+#### Residuals
+
+Residuals are the difference between the predicted value and the actual value. When running models, hopefully you want to minimize the size of the residuals. (You only have so much control over it though, since if the measurements you have don't have much of a relationship with your variable of interest, your models won't turn out well no matter what you do.) After running a linear model your residuals should be uniformly distributed compared to the actual data.
+
+```{r}
+### ok example
+# Take the model we already ran and add the predictions back to the data
+phenol_model %>% 
+  augment() %>%
+# Plot the residuals against the independent variable (NOT the variable you 
+# want a prediction for, the x variable)
+ggplot(aes(x = TotalPhenol, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  theme_bw()
+
+### very bad not good example
+# again simulating data...it shouldn't ever be this bad
+tibble(normal = rnorm(100),
+       binomial = rbinom(100, 1, prob = 0.5)) %>%
+# run the model and add it back to the original table
+  lm(normal ~ binomial, data = .) %>%
+  augment() %>%
+# and again, plot the residuals against the independent variable
+ggplot(aes(x = binomial, y = .resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  theme_bw()
+```
+
+<br>
+
+### Multiple Linear Regression
+
+You can run a linear model on more than one variable. For this section, we'll build on this simple, one-variable linear model
+
+```{r}
+lm(Flavanoids ~ TotalPhenol, data = wine) %>% tidy()
+
+lm(Flavanoids ~ TotalPhenol, data = wine) %>% glance()
+
+lm(Flavanoids ~ TotalPhenol, data = wine) %>% augment()
+```
+
+#### Additive Models
+
+Add in a second variable using a `+`
+
+```{r}
+### run the model and see how model looks 
+lm(Flavanoids ~ TotalPhenol + NonflavPhenols, data = wine) %>% tidy()
+
+lm(Flavanoids ~ TotalPhenol + NonflavPhenols, data = wine) %>% glance()
+
+lm(Flavanoids ~ TotalPhenol + NonflavPhenols, data = wine) %>% augment()
+```
+
+You can do this for as many variables as you have in your dataset, although there's a diminishing return on how much each additional variable improves the model. However, each additional variable with always improve the model fit a bit.
+
+```{r}
+lm(Flavanoids ~ TotalPhenol + NonflavPhenols + MalicAcid + Ash, data = wine) %>% tidy()
+```
+
+#### Interaction Models
+
+You can also check the interaction effect of two or more variables using a colon `:` instead of a `+`
+
+```{r}
+lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% tidy()
+
+lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% glance()
+
+lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% augmnet()
+```
+
+#### Both Additive and Interaction Models
+
+You can run both 
+
+```{r}
+lm(Flavanoids ~ TotalPhenol * NonflavPhenols, data = wine) %>% tidy()
+
+lm(Flavanoids ~ TotalPhenol * NonflavPhenols, data = wine) %>% glance()
+
+lm(Flavanoids ~ TotalPhenol * NonflavPhenols, data = wine) %>% glance()
+```
+
+#### Can Also Do This with ANOVA
+
+```{r}
+aov(Flavanoids ~ TotalPhenol + NonflavPhenols, data = wine)
+```
+
+<br>
+
+### Which model is better?
+
+Which of our models using `TotalPhenol` and `NonflavPhenols` is the best? For that, we have to check the model parameters using `glance()` and compare the R^2 and the Akaike Information Criterion (AIC) of the models. 
+
+The interaction model has a terrible R^2 close to 0 and an AIC double that of the other two models. This is objectively the worst model. The additive and combination models are very close with essentially the same R^2. The AIC for the interaction model is 2 less than for the additive model, so should probably go with the additive model since they're so close.
+
+```{r}
+### additive model
+lm(Flavanoids ~ TotalPhenol + NonflavPhenols, data = wine) %>% glance()
+
+### interaction model
+lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% glance()
+
+### combination of both
+lm(Flavanoids ~ TotalPhenol * NonflavPhenols, data = wine) %>% glance()
+```
+
+
+
+
+
+
+
