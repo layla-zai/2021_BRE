@@ -156,7 +156,7 @@ Today's Assignment: **Linear Models** [Rmarkdown](R/2021-07-15_statiscs2_lm/2021
 
 #### **July 16:** Exploratory Data Analysis
 
-- [slides](R/2021-07-16_exploratory_data_analysis/2020-07-16_exploratory_data_analysis.pdf)
+- [slides](R/2021-07-16_exploratory_data_analysis/2021-07-16_exploratory_data_analysis.pdf)
 
 <br>
 
