@@ -34,6 +34,9 @@ You already have the `magrittr` package installed because it comes with `tidyver
 
 ```{r}
 library(magrittr)
+
+iris %>% head() %>% class()
+iris %$% head(Sepal.Length) %>% class()
 ```
 
 #### Read in Data
@@ -50,7 +53,7 @@ read_tsv('wine.tsv') -> wine
 
 Technically, before you run a linear model, you should check that the data is linear. You should always plot your data of interest to make sure it appears linear before running a linear model, but the formal way to check for linearity is with a Q-Q plot. What this does is plot your data against the normal distribution to check if it's linear/normally distributed. You can only plot a Q-Q plot for a single variable at a time, so you should do a Q-Q plot for all variables you plan on running a linear model for.
 
-```{r}
+```{r, fig.height = 3, fig.width = 3}
 ### theoretical ideal Q-Q plot
 # these two lines generate the perfect linear distribution
 # you don't need to know the qnorm() part for 
@@ -66,7 +69,7 @@ ggplot(aes(sample = value)) +
 
 Of course real data never looks this clean, so taking a look at some of wine variables we can see what good and so-so data looks like in reality
 
-```{r}
+```{r, fig.width = 1, fig.height = 1}
 ### good
 ggplot(wine, aes(sample = Ash)) +
   geom_qq() +
@@ -91,7 +94,7 @@ ggplot(wine, aes(sample = MalicAcid)) +
 
 Correlation measures the strength of the relationship between two numeric variables. It ranges from -1 to 1, where -1 is a perfect negative correlation while 1 is a perfect positive correlation. The closer your correlation is to -1 or 1 the better, while the closer you are to 0, the worse your correlation is. Below, take a look at some simulated data at various levels of correlation that we'll use for our correlation calculation examples.
 
-```{r, fig.width = 3, fig.height = 3}
+```{r, fig.width = 1, fig.height = 1}
 ### teeny bit of variation
 # again, don't expect you to be able to simulate data
 tibble(x = seq(0.01, 1, 0.01)) %>%
@@ -178,6 +181,7 @@ phenol_model %>% class()
 
 # And we can see that it's calculated the model for us
 phenol_model %>% tidy()
+phenol_model %>% glance()
 ```
 
 Now that a model's been run, we can use it to estimate the Flavanoid levels of some new data! 
@@ -202,7 +206,7 @@ new_data %>%
 
 Now that we've made some predictions, we want to check how accurate those predictions are both mathematically and visually.
 
-```{r}
+```{r, fig.width = 1, fig.height = 1}
 ### How accurate is it?
 # Mathematically we can check the difference between the actual value and the
 # predicted value
@@ -226,7 +230,7 @@ ggplot(predictions, aes(x = Flavanoids, y = flavanoid_prediction)) +
 
 Residuals are the difference between the predicted value and the actual value. When running models, hopefully you want to minimize the size of the residuals. (You only have so much control over it though, since if the measurements you have don't have much of a relationship with your variable of interest, your models won't turn out well no matter what you do.) After running a linear model your residuals should be uniformly distributed compared to the actual data.
 
-```{r}
+```{r, fig.width = 1, fig.height= 1}
 ### ok example
 # Take the model we already ran and add the predictions back to the data
 phenol_model %>% 
@@ -283,6 +287,8 @@ You can do this for as many variables as you have in your dataset, although ther
 
 ```{r}
 lm(Flavanoids ~ TotalPhenol + NonflavPhenols + MalicAcid + Ash, data = wine) %>% tidy()
+
+lm(Flavanoids ~ TotalPhenol + NonflavPhenols + MalicAcid + Ash, data = wine) %>% glance()
 ```
 
 #### Interaction Models
@@ -294,7 +300,7 @@ lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% tidy()
 
 lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% glance()
 
-lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% augmnet()
+lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% augment()
 ```
 
 #### Both Additive and Interaction Models
@@ -302,17 +308,18 @@ lm(Flavanoids ~ TotalPhenol:NonflavPhenols, data = wine) %>% augmnet()
 You can run both 
 
 ```{r}
+lm(Flavanoids ~ TotalPhenol + NonflavPhenols, data = wine) %>% tidy()
 lm(Flavanoids ~ TotalPhenol * NonflavPhenols, data = wine) %>% tidy()
 
 lm(Flavanoids ~ TotalPhenol * NonflavPhenols, data = wine) %>% glance()
 
-lm(Flavanoids ~ TotalPhenol * NonflavPhenols, data = wine) %>% glance()
+lm(Flavanoids ~ TotalPhenol * NonflavPhenols, data = wine) %>% augment()
 ```
 
 #### Can Also Do This with ANOVA
 
 ```{r}
-aov(Flavanoids ~ TotalPhenol + NonflavPhenols, data = wine)
+aov(Flavanoids ~ TotalPhenol + NonflavPhenols, data = wine) %>% tidy()
 ```
 
 <br>

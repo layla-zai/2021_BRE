@@ -102,7 +102,7 @@ Today's Assignment: **Data Visualization** [Rmarkdown](R/2021-07-08_ggplot/2021-
 
 <br>
 
-Today's Assignment: **Reading in and Tidying Data** [Rmarkdown](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_assignment.Rmd) and the [data](R/2021-07-09_readr_and_tidyr/data.zip)
+Today's Assignment: **Reading in and Tidying Data** [Rmarkdown](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_assignment.Rmd) and the [data](R/2021-07-09_readr_and_tidyr/data.zip), ANSWER KEY in [Rmarkdown](R/2021-07-09_readr_and_tidyr/2021-07-09_readr_tidyr_assignment_ANSWERKEY.Rmd) 
 
 ---
 
@@ -118,7 +118,7 @@ Today's Assignment: **Reading in and Tidying Data** [Rmarkdown](R/2021-07-09_rea
 
 <br>
 
-Today's Assignment: **Statistics and broom** [Rmarkdown](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_assignment.Rmd) and the [data](R/2021-07-13_statistics_review_broom/data.zip)
+Today's Assignment: **Statistics and broom** [Rmarkdown](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_assignment.Rmd) and the [data](R/2021-07-13_statistics_review_broom/data.zip), ANSWER KEY in [Rmarkdown](R/2021-07-13_statistics_review_broom/2021-07-13_statistics_assignment_ANSWER_KEY.Rmd) 
 
 ---
 
@@ -145,8 +145,22 @@ Today's Assignment: **Clustering** [Rmarkdown](R/2021-07-14_clustering/2021-07-1
   - selecting the best model
 - [slides](R/2021-07-15_statiscs2_lm/2021-07-15_statistics2_lm.pdf)
 - demo [Rmd](R/2021-07-15_statiscs2_lm/2021-07-15_statistics2_lm_demo.Rmd)
+  - and demo [Rmd with in class additions](R/2021-07-15_statiscs2_lm/2021-07-15_statistics2_lm_demo_INCLASS.Rmd)
   - demo [data](R/2021-07-15_statiscs2_lm/wine.tsv)
 
 <br>
 
 Today's Assignment: **Linear Models** [Rmarkdown](R/2021-07-15_statiscs2_lm/2021-07-15_lm_assignment.Rmd) and the [data](R/2021-07-15_statiscs2_lm/data.zip)
+
+---
+
+#### **July 16:** Exploratory Data Analysis
+
+- [slides](R/2021-07-16_exploratory_data_analysis/2020-07-16_exploratory_data_analysis.pdf)
+
+<br>
+
+Today's Assignment: **Exploratory Data Analysis** [assignment](R/2021-07-16_exploratory_data_analysis/exploratory_data_analysis_assignment.pdf) and the [template](R/2021-07-16_exploratory_data_analysis/exploratory_data_analysis_template.Rmd)
+
+  - example [Rmd](R/2021-07-16_exploratory_data_analysis/example_exploratory_data_analysis.Rmd) and example [data](R/2021-07-16_exploratory_data_analysis/colon.csv)
+  - Tidy Tuesday <https://github.com/rfordatascience/tidytuesday>
