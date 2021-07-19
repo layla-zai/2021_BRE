@@ -1,0 +1,95 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+library(vroom)
+
+library(DESeq2)
+library(ggdendro)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2021-07-20: Getting Started with RNA-seq, Reading in the Data and Clustering
+
+Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the filename by 9AM Wednesday 7/21. **THIS IS DUE TOMORROW, I NEED TO KNOW YOU CAN READ THE DATA IN BEFORE WE KEEP GOING**
+
+---
+
+### Lecture Questions
+
+1. What is the minimum number of samples necessary for RNA-seq?
+
+*WRITE YOUR ANSWER HERE*
+
+---
+
+2. When would you need to use ribosomal RNA depletion to make an RNA-seq library instead of using poly-A capture?
+
+*WRITE YOUR ANSWER HERE*
+
+---
+
+3. If you have a gene covered by only 5 reads, what should you do with it?
+
+*WRITE YOUR ANSWER HERE*
+
+---
+
+4. What are 3 qualities of RNA you can analyze using RNA-seq data?
+
+*WRITE YOUR ANSWER HERE*
+
+---
+
+5. Give one advantage and one disadvantage of single cell RNA-seq compared to bulk RNA-seq.
+
+*WRITE YOUR ANSWER HERE*
+
+---
+
+<br>
+
+### RNA-seq with Full Data Set
+
+#### Read / Wrangle Data
+
+Taking the data in the zipped folder `full_count_files` which contains the full RNA-seq count tables for the human genome (not just the chr21 files we were using for the demo) and use the chunk below to read it in
+
+```{r}
+### use this chunk to read the files in
+```
+
+Use this chunk to transform the count tables we just read in into a DESeq object.
+
+```{r}
+### make the data into a DESeq object
+```
+
+Finally, in the last wrangling step, filter the data. Make sure to remove **BOTH** rows that only have zero counts and to filter for genes where at least 3 samples have a count of 10 transcripts or more
+
+```{r}
+### filter the object
+```
+
+<br>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

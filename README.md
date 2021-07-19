@@ -165,3 +165,21 @@ Today's Assignment: **Exploratory Data Analysis** [assignment](R/2021-07-16_expl
 
   - example [Rmd](R/2021-07-16_exploratory_data_analysis/example_exploratory_data_analysis.Rmd) and example [data](R/2021-07-16_exploratory_data_analysis/colon.csv)
   - Tidy Tuesday <https://github.com/rfordatascience/tidytuesday>
+
+---
+
+#### **July 20:** Introduction to RNA-seq
+
+- Introduction to RNA-seq
+  - Lab process and considerations for RNA-seq
+  - Overview of processing RNA-seq data
+  - General analysis description
+  - single cell RNA-seq
+  - Reading and wrangling RNA-seq data in R
+- [slides](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_intro_to_rnaseq.pdf)
+- demo [Rmd](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_intro_rna-seq_reading_clustering_demo.Rmd)
+  - demo [data](git add RNA-seq/2021-07-20_intro_rnaseq/chr21_count_files.zip)
+
+<br>
+
+Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_assignment_read_cluster_rna-seq.Rmd) and the [data](RNA-seq/2021-07-20_intro_rnaseq/full_count_files.zip)
