@@ -178,7 +178,7 @@ Today's Assignment: **Exploratory Data Analysis** [assignment](R/2021-07-16_expl
   - Reading and wrangling RNA-seq data in R
 - [slides](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_intro_to_rnaseq.pdf)
 - demo [Rmd](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_intro_rna-seq_reading_clustering_demo.Rmd)
-  - demo [data](git add RNA-seq/2021-07-20_intro_rnaseq/chr21_count_files.zip)
+  - demo [data](RNA-seq/2021-07-20_intro_rnaseq/chr21_count_files.zip)
 
 <br>
 
