@@ -13,7 +13,7 @@ library(ggdendro)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 2021-07-20: Getting Started with RNA-seq, Reading in the Data and Clustering
+## 2021-07-20: Getting Started with RNA-seq by Reading in the Data
 
 Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the filename by 9AM Wednesday 7/21. **THIS IS DUE TOMORROW, I NEED TO KNOW YOU CAN READ THE DATA IN BEFORE WE KEEP GOING**
 
