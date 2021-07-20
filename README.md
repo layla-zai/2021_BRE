@@ -177,9 +177,25 @@ Today's Assignment: **Exploratory Data Analysis** [assignment](R/2021-07-16_expl
   - single cell RNA-seq
   - Reading and wrangling RNA-seq data in R
 - [slides](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_intro_to_rnaseq.pdf)
-- demo [Rmd](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_intro_rna-seq_reading_clustering_demo.Rmd)
+- demo [Rmd](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_intro_rna-seq_reading_clustering_demo.Rmd) and with in class [changes](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_intro_rna-seq_reading_clustering_demo_IN_CLASS.Rmd)
   - demo [data](RNA-seq/2021-07-20_intro_rnaseq/chr21_count_files.zip)
 
 <br>
 
 Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_assignment_read_cluster_rna-seq.Rmd) and the [data](RNA-seq/2021-07-20_intro_rnaseq/full_count_files.zip)
+
+---
+
+#### **July 20:** Clustering RNA-seq and Differential Expression Testing
+
+- normalizing RNA-seq counts
+  - Nice overview of RNA-seq normalization and the different normalized counts <https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html> 
+- clustering
+- differential expression testing
+- [slides](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_clust_diff_exp.pdf)
+- demo [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_clust_diff_exp_demo.Rmd)
+  - Same demo [data](RNA-seq/2021-07-20_intro_rnaseq/chr21_count_files.zip)
+
+<br>
+
+Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_assignment_clust_diff_exp.Rmd) and the same [data](RNA-seq/2021-07-20_intro_rnaseq/full_count_files.zip)

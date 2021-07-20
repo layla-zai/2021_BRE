@@ -1,0 +1,85 @@
+---
+title: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+library(vroom)
+
+library(DESeq2)
+library(ggdendro)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2021-07-21: RNA-Seq Clustering and Differential Expression Testing
+
+Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the filename by 9AM Friday 7/21.
+
+---
+
+### RNA-seq with Full Data Set
+
+#### Read / Wrangle Data
+
+Taking the data in the zipped folder `full_count_files` which contains the full RNA-seq count tables for the human genome (not just the chr21 files we were using for the demo) and use the chunk below to read it in, and convert it into a filtered `DESeq` object. (Basically you should just copy/paste your code in the chunk below from yesterday's assignment). Make sure to specify which treatment is the control/reference treatment.
+
+```{r}
+### read data in here
+```
+
+<br>
+
+### Check for Treatment and Batch Effects by Clustering
+
+#### Normalize the Data
+
+```{r}
+
+```
+
+#### Hierarchical Clustering
+
+Use the chunk below to plot a dendrogram.
+
+```{r}
+
+```
+
+#### PCA
+
+Use the chunk below to plot a PCA
+
+```{r}
+
+```
+<br>
+
+---
+
+<br>
+
+### Run Differential Expression for 2 Different Treatments
+
+#### Test
+
+Use the chunk below to run differential expression
+
+```{r}
+
+```
+
+#### Get and Save Results
+
+Use the chunk below to extract the differential expression results for both treatments and save the tables.
+
+```{r}
+
+```
+
+
+
+
+

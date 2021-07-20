@@ -1,0 +1,171 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+library(vroom)
+
+library(DESeq2)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<br><br>
+
+# 2021-07-20 Introduction to Differential Expression with `DESEq2`: Reading in Data
+
+We will be conducting differential expression analysis with the goal of identifying genes that have changed their activity in response to some perturbation (in our example data, treatment with DAC or treament with ) using the R Bioconductor package `DESeq2`. `DESeq2` is a popular and user-friendly package to perform differential expression using negative binomical generalized linear models. This lesson will cover the basics, but for more details you can check the `DESeq2` Vignette <https://bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#annotating-and-exporting-results>
+
+To get started, we'll just focus on reading in and filtering our data today.
+
+---
+
+The data we have been using for this RNA-seq tutorial is from a former PhD student in the lab, Sandra Deliard. We have three sets of triplicates both in YB5 cells, control (siC) and treated with DAC (dac) or small interfering RNAs. DAC is a DNA methyltransferase inhibitor (DNMT) and treatment with it results in global hypomethylation and increased expression. Details for the sample names are given in the table below. Small interfering RNAs that are complementary to an mRNA transcript can be used to inhibit a particular protein, preventing it from being transcribed. Three samples were treated with siRNAs against SF3B1, which is a splicing factor part of several complexes that are resposible for the alternative splicing step of making mature mRNAs.
+
+| Sample ID | treatment | replicate |
+| --- | --- | --- |
+| siCl | control | 1 |
+| siC2 | control | 2 |
+| siC3 | control | 3 |
+| dac1 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 1 |
+| dac2 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 2 |
+| dac3 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 3 |
+| siSF1 | small interfering RNA inhibition of SF3B1 | 1 |
+| siSF2 | small interfering RNA inhibition of SF3B1 | 2 |
+| siSF3 | small interfering RNA inhibition of SF3B1 | 3 |
+
+---
+
+<br>
+
+## Install Packages
+
+If you don't have any of the necessary packages installed, uncomment the install lines in the chunk below and install them.
+
+```{r}
+### vroom
+# The vroom package has one function, vroom, for fast and lazy data read in. 
+# Vroom works like readr, but is much faster with a 55-60x speedup.
+#install.pacakges('vroom')
+
+### DESeq2
+# Package to do differential expression
+# if (!requireNamespace("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#
+#BiocManager::install("DESeq2")
+```
+
+<br>
+
+---
+
+<br>
+
+## Read / Wrangle Files
+
+### Read Files in Recursively
+
+```{r}
+# get list of files
+list.files(path = '../chr21_count_files',
+           pattern = '.txt$',
+           full.names = T) -> files
+
+### read files in recursively with vroom()
+# "id" tells vroom that you want to keep the file path and put it in a column
+# named 'file_path', comment tells vroom what character the file uses for 
+# comments and to ignore any lines starting with that character, skip says to
+# skip the first two lines (the comment and column names) which we're skipping
+# so we can supply the column names ourselves so that they'll be the same for
+# all files
+vroom::vroom(files, id = 'file_path', delim = '\t', comment = '#', skip = 2, 
+# Give vroom the column names so the files all have the same column names
+             col_names = c('ensembl_gene_id', 'chr', 'start', 'end', 
+                           'strand', 'length', 'count')) %>%
+# Add the sample ID as an additional column using str_extract(), which pulls a
+# string based on the regular expression you give it. Here I asked for strings
+# starting with either d or s, followed by any 2-3 letters of the alphabet 
+# either upper or lower case followed by any number
+  mutate(sample_id = str_extract(file_path, '[d,s][A-z]{2,3}[0-9]'),
+# Add the treatment by removing the number from the sample ID
+         treatment = str_remove_all(sample_id, '[0-9]')) %>%
+# drop the file path because we don't need it anymore.
+  dplyr::select(-file_path) -> data
+```
+
+<br>
+
+### Wrangle Data for `DESeq2`
+
+`DESeq2` requires that the data be in an S4 object of class `DESeqDataSet` before you can use its functions to conduct differential expression. `DESeq2` and Bioconductor pacakges in general like to use S4 objects because S4s have very strict definitions, which prevent users from making naive mistakes in creating and modifying them. S4 objects have slots that can be filled with whatever information the creator specifies. For a `DESeqDataSet`, a custom S4 class, this includes, but is not limited to, the raw RNA-seq counts, metadata (ex: treatement, batch) from the experiment, experimental design, and the results of the differential expression analysis.
+
+**TL;DR** `DESeq2` requires data to be in a specific and semi-custom format before you can calculate differential expression, so we'll put the data into that format in this section.
+
+---
+
+Here we're going to make two tables; a count matrix with genes as rows, samples as columns and read counts as the data, and a metadata table with the sample IDs and any other relevant information. Here the information is just treatment, but it could include other covariates like sex or batch. **NOTE:** The columns in the count matrix and the rows in the metadata table *MUST BE THE SAME* and *IN THE SAME ORDER* or the information in the count matrix and the metadata tables will not be matched up properly.
+
+```{r}
+data %>%
+  dplyr::select(ensembl_gene_id, sample_id, count) %>%
+  pivot_wider(names_from = sample_id, values_from = count) %>% 
+  as.data.frame() -> count_matrix
+
+data %>%
+  dplyr::select(sample_id, treatment) %>%
+  distinct() -> metadata
+```
+
+<br>
+
+#### Convert to DESeq2 DESeqDataSet Object
+
+Use the helper function `DESeqDataSetFromMatrix()` to put our data into a `DESeqDAtaSet` object.
+  
+```{r}
+# given the function the count and metadata tables
+dds <- DESeqDataSetFromMatrix(countData = count_matrix,
+                              colData = metadata,
+# tidy = T says that our data is in tidy format and the first columns of the
+# tables should be taken as row.names
+                              tidy = TRUE,
+# Give the design of the experiment, here just taking treatment into account
+                              design = ~ treatment + 0)
+
+dds %>% class()
+```
+
+<br>
+
+#### Pre-filter the dataset
+
+It's standard to pre-filter data for hypothesis tests because you don't want to include genes that for example, have no counts detected in any samples or have extrememly low counts in many samples and have to have an increased multiple testing correction.
+
+```{r}
+### filter out rows that contain only zero counts
+keep <- rowSums(counts(dds)) >= 1
+dds <- dds[keep, ]
+
+### can check how many genes will be filter out with table() or summary()
+table(keep)
+summary(keep)
+
+### NOT DOING, but example
+### YOU NEED TO DO THIS FOR THE HOMEWORK WITH THE FULL DATA instead of filtering
+### for some reads
+# Filter for genes where at least seven samples have a count of 10 or higher
+keep <- rowSums(counts(dds) >= 10) >= 7
+dds <- dds[keep, ]
+```
+
+<br>
+
+
+
+
+
+
+
