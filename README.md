@@ -186,7 +186,7 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-20_intro_rnas
 
 ---
 
-#### **July 20:** Clustering RNA-seq and Differential Expression Testing
+#### **July 21:** Clustering RNA-seq and Differential Expression Testing
 
 - normalizing RNA-seq counts
   - Nice overview of RNA-seq normalization and the different normalized counts <https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html> 
