@@ -13,7 +13,7 @@ library(ggupset)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# 2021-07-21: RNA-Seq Clustering and Differential Expression Testing
+# 2021-07-22: Wrangling and Visualizing RNA-seq Results
 
 Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the filename by 9AM Tuesday 7/27.
 
