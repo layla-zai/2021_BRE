@@ -1,0 +1,200 @@
+---
+title: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+library(vroom)
+
+library(ggupset)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 2021-07-21: RNA-Seq Clustering and Differential Expression Testing
+
+Please email me your Rmarkdown document at <kkeith@coriell.org> with your **LAST NAME** in the filename by 9AM Tuesday 7/27.
+
+---
+
+<br>
+
+---
+
+## Lecture Questions
+
+For the multiple choice questions, please select your answer in **bold**.
+
+---
+
+1. What is the correct interpretation of an MA plot?
+  **a. As a gene moves farther away from the horizontal line running through 0 on the y-axis, the greater the change in gene expression between conditions.**
+  b. The closer a gene is to the horizontal line running through 0 on the y-axis, the greater the change in gene expression between conditions.
+  c. Only genes that have low mean expression can be differentially expressed.
+  d. The MA plot shows the statistical significance of all genes tested.
+
+---
+
+2. What is the correct interpretation of a volcano plot?
+  a. As you move farther away from 0 on the x-axis, the difference in expression between conditions decreases and as you move up the y-axis the statistical significance of the difference increases, so the points at the top middle of the plot are the most significantly differentially expressed genes.
+  b. As you move farther away from 0 on the x-axis, the difference in expression between conditions decreases and as you move up the y-axis the statistical significance of the difference decreases, so the points at the center bottom of the plot are the most significantly differentially expressed genes.
+  **c.  As you move farther away from 0 on the x-axis, the difference in expression between conditions increases and as you move up the y-axis the statistical significance of the difference increases, so the points at the top right and left of the plot are the most significantly differentially expressed genes.**
+  d. As you move farther away from 0 on the x-axis, the difference in expression between conditions increases and as you move up the y-axis the statistical significance of the difference decreases, so the points at the bottom right and left of the plot are the most significantly differentially expressed genes.
+
+---
+
+3. What is the correct interpretation of an UpSet plot?
+  a. Having bars of all equal heights means there's a large overlap between sets.
+  b. Any tall bar means that there's a large overlap between sets.
+  c. Having tall bars at the single dots means there's a large overlap between sets.
+  **d. The points and lines at the bottom show the intersection between the sets, so if the bar is large where sets overlap, there is strong overlap between conditions.**
+
+---
+
+<br>
+
+---
+
+## Exploring RNA-seq Results
+
+### Read / Wrangle Data
+
+#### Read Data In
+
+Use the chunk below to read in your differential expression results from the last homework.
+
+```{r}
+vroom('../2021-07-21_clust_diff_exp/diff_exp.tsv') %>%
+  mutate(ensembl_gene_id = str_remove(ensembl_gene_id, '\\.[0-9]*')) -> diff_exp
+```
+
+### Wrangle Data
+
+Use the chunk below to get human readable gene names for your results
+
+```{r}
+AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+       keys = unique(diff_exp$ensembl_gene_id), 
+       column = 'SYMBOL',
+       keytype = 'ENSEMBL',
+       multiVals = 'first') %>% 
+  enframe(name = 'ensembl_gene_id', value = 'gene') -> gene_names
+```
+
+Finally use the chunk below to combine your differential expression table, table of gene names, and to add useful columns for plotting to it. Make sure to add columns indicating:
+
+- Whether or not the gene is significantly differentially expressed
+- The direction the expression of the gene changes relative to control.
+- The -log10 of the q-value
+
+```{r}
+diff_exp %>% 
+  left_join(gene_names, by = 'ensembl_gene_id') %>%
+  dplyr::select(gene, ensembl_gene_id, everything()) %>%
+  mutate(sig = ifelse(padj < 0.05 & log2FoldChange >= 1, 
+                      'sig', 'notsig'),
+         direction = ifelse(log2FoldChange < 0, 'downregulated', 'upregulated'),
+         log_qvalue = -log10(padj)) %>%
+  replace_na(list(sig = 'notsig', log_qvalue = 0)) -> diff_exp_tbl
+```
+
+<br>
+
+### Visualize Results
+
+#### MA Plot
+
+Use the chunk below to plot an MA plot
+
+```{r}
+length(unique(diff_exp_tbl$ensembl_gene_id)) -> genes_detected
+
+diff_exp_tbl %>% 
+  group_by(direction, treatment, sig) %>%
+  dplyr::count() %>%
+  ungroup() %>%
+  complete(direction, treatment, sig, fill = list(n = 0)) %>%
+  filter(sig == 'sig') %>%
+  mutate(label = paste0(n, ', ', round((n / genes_detected), 1), '%'),
+         baseMean = 7500,
+         log2FoldChange = rep(c(-3, 4), each = 2)) -> ma_labels
+
+# plot
+ggplot(diff_exp_tbl, aes(x = baseMean, y = log2FoldChange)) +
+  geom_point(aes(color = sig)) +
+  scale_color_manual(values = c('gray30', 'firebrick3')) +
+  geom_hline(yintercept = 0, color = 'gray60', linetype = 'dashed') +
+  geom_text(data = ma_labels, aes(label = label), size = 8) +
+  facet_wrap(~ treatment) +
+  labs(x = 'Mean Expression (Counts)', y = 'Log2 Fold Change') +
+  coord_cartesian(xlim = c(0, 10000), ylim = c(-10, 10)) +
+  theme_classic() +
+  theme(legend.position = 'none')
+```
+
+#### Volcano Plot
+
+Use the chunk below to plot a volcano plot
+
+```{r}
+# make labels
+diff_exp_tbl %>% 
+  group_by(direction, treatment, sig) %>%
+  dplyr::count() %>%
+  ungroup() %>%
+  complete(direction, treatment, sig, fill = list(n = 0)) %>%
+  filter(sig == 'sig') %>%
+  mutate(label = paste0(n, ', ', round((n / genes_detected), 1), '%'),
+         log2FoldChange = rep(c(-7, 7), each = 2),
+         log_qvalue = 200) -> volc_labels
+
+# plot
+diff_exp_tbl %>%
+  mutate(gene_label = ifelse(sig == 'sig', gene, '')) %>%
+
+ggplot(aes(x = log2FoldChange, y = log_qvalue)) +
+  geom_point(aes(color = sig)) +
+  scale_color_manual(values = c('gray30', 'firebrick3')) +
+  geom_hline(yintercept = -log10(0.05), color = 'gray60', linetype = 'dashed') +
+  geom_vline(xintercept = c(-1, 1), color = 'gray60', linetype = 'dashed') +
+  ggrepel::geom_text_repel(aes(label = gene_label)) +
+  geom_text(data = volc_labels, aes(label = label), size = 6) +
+  facet_wrap(~ treatment) +
+  labs(x = 'Log2 Fold Change', y = '-Log10 QValue') +
+  coord_cartesian(xlim = c(-10, 10)) +
+  theme_classic(base_size = 14) +
+  theme(legend.position = 'none')
+```
+
+#### UpSet Plot
+
+Use the chunk below to plot an UpSet plot
+
+```{r}
+### arrange the data for the upset plot
+diff_exp_tbl %>%
+  filter(sig == 'sig') %>%
+  select(ensembl_gene_id, treatment) %>%
+  group_by(ensembl_gene_id) %>%
+  summarize(treatment = list(treatment)) %>%
+  ungroup() -> sig_genes
+
+### plot
+ggplot(sig_genes, aes(x = treatment)) +
+  geom_bar() +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -1) +
+  scale_x_upset() +
+  scale_y_continuous(lim = c(0, 650)) +
+  labs(x = '') +
+  theme_classic()
+```
+
+
+
+
+<br>
+
+
+

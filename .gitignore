@@ -3,8 +3,15 @@
 *.pptx
 temp.md
 *.docx
+*.tsv
+*.png
+RNA-seq/chr21_count_files.zip
+RNA-seq/full_count_files.zip
+RNA-seq/rna-seq_master.Rmd
 
 ### folders to ignore
 **/graded_homework
 R/2021-07-15_statiscs2_lm/class_prep/
 **/data
+**/full_count_files
+**/chr21_count_files

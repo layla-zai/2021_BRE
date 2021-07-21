@@ -1,0 +1,349 @@
+---
+title: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+library(vroom)
+
+library(DESeq2)
+library(ggdendro)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<br><br>
+
+# 2021-07-20 Introduction to Differential Expression with `DESEq2`: Clustering Data and Differential Expression Testing
+
+We will be conducting differential expression analysis with the goal of identifying genes that have changed their activity in response to some perturbation (in our example data, treatment with DAC or treament with ) using the R Bioconductor package `DESeq2`. `DESeq2` is a popular and user-friendly package to perform differential expression using negative binomical generalized linear models. This lesson will cover the basics, but for more details you can check the `DESeq2` Vignette <https://bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#annotating-and-exporting-results>
+
+Today we'll be building on the data reading and wrangling we discussed yesterday and now clustering and doing differential expression testing.
+
+---
+
+The data we have been using for this RNA-seq tutorial is from a former PhD student in the lab, Sandra Deliard. We have two sets of triplicates both in YB5 cells, control (siC) and treated with DAC (dac) or small interfering RNAs. DAC is a DNA methyltransferase inhibitor (DNMT) and treatment with it results in global hypomethylation and increased expression. Details for the sample names are given in the table below. Small interfering RNAs that are complementary to an mRNA transcript can be used to inhibit a particular protein, preventing it from being transcribed. Three samples were treated with siRNAs against SF3B1, which is a splicing factor part of several complexes that are resposible for the alternative splicing step of making mature mRNAs.
+
+| Sample ID | treatment | replicate |
+| --- | --- | --- |
+| siCl | control | 1 |
+| siC2 | control | 2 |
+| siC3 | control | 3 |
+| dac1 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 1 |
+| dac2 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 2 |
+| dac3 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 3 |
+| siSF1 | small interfering RNA inhibition of SF3B1 | 1 |
+| siSF2 | small interfering RNA inhibition of SF3B1 | 2 |
+| siSF3 | small interfering RNA inhibition of SF3B1 | 3 |
+
+---
+
+<br>
+
+## Install Packages
+
+If you don't have any of the necessary packages installed, uncomment the install lines in the chunk below and install them.
+
+```{r}
+### Fastcluster
+# Faster implementation of the hclust() function for hierarchical clustering
+#install.packages('fastcluster')
+
+### ggdendro
+# This is an extension to ggplot2 to allow you to easily plot dendrograms
+#install.packages('ggdendro')
+```
+
+---
+
+<br>
+
+## Review from Yesterday: Read in the Data Back In
+
+Same as yesterday, but with a twist; we're going to make 2 objects for demonstration purposes, one with 2 conditions and one with all 3 conditions
+
+```{r}
+### get list of files
+list.files(path = '../chr21_count_files',
+           pattern = '.txt$',
+           full.names = T) -> files
+
+### read files in recursively with vroom()
+vroom::vroom(files, id = 'file_path', delim = '\t', comment = '#', skip = 2, 
+             col_names = c('ensembl_gene_id', 'chr', 'start', 'end', 
+                           'strand', 'length', 'count')) %>%
+  mutate(sample_id = str_extract(file_path, '[d,s][A-z]{2,3}[0-9]'),
+         treatment = str_remove_all(sample_id, '[0-9]')) %>%
+  dplyr::select(-file_path) -> data
+
+### transform data and create a DESeq object...for 2 conditions
+# count matrix
+data %>% 
+  filter(treatment != 'siSF') %>%
+  dplyr::select(ensembl_gene_id, sample_id, count) %>%
+  spread(sample_id, count) %>% 
+  as.data.frame() -> count_matrix_2cond
+# metadata
+data %>%
+  filter(treatment != 'siSF') %>%
+  dplyr::select(sample_id, treatment) %>%
+  distinct() -> metadata_2cond
+# convert to DESeq object
+dds_2cond <- DESeqDataSetFromMatrix(countData = count_matrix_2cond,
+                                    colData = metadata_2cond,
+                                    tidy = TRUE,
+                                    design = ~ treatment + 0)
+
+### transform data and create a DESeq object...for all 3 conditions
+# count matrix
+data %>% 
+  dplyr::select(ensembl_gene_id, sample_id, count) %>%
+  spread(sample_id, count) %>% 
+  as.data.frame() -> count_matrix_3cond
+# metadata
+data %>%
+  dplyr::select(sample_id, treatment) %>%
+  distinct() -> metadata_3cond
+# convert to DESeq object
+dds_3cond <- DESeqDataSetFromMatrix(countData = count_matrix_3cond,
+                                    colData = metadata_3cond,
+                                    tidy = TRUE,
+                                    design = ~ treatment + 0)
+### extra argument - make sure DESeq knows what the reference is 
+dds_3cond$treatment <- relevel(dds_3cond$treatment, ref = "siC")
+
+### filter the data
+# 2 conditions
+keep_2cond <- rowSums(counts(dds_2cond)) >= 1
+dds_2cond <- dds_2cond[keep_2cond, ]
+# 3 conditions
+keep_3cond <- rowSums(counts(dds_3cond)) >= 1
+dds_3cond <- dds_3cond[keep_3cond, ]
+
+table(keep_2cond)
+table(keep_3cond)
+```
+
+<br>
+
+---
+
+<br>
+
+## Check Quality by Examing the Associations Between Samples
+
+For whatever reason, sometimes one or a few samples can have divergent measurements from the rest of the data. We want to check for that before doing differential expression so we can correct for it, for example by including batch as a covariate in our model or using a package like `RUVSeq` to perform further specialized normalizations.
+
+### Normalize RNA-seq Counts
+
+`DESeq2` stores raw (non-normalized) counts in the `DESeqDataSet` object, but we need those counts to be normalized before doing any clustering. The `fpm()` function from `DESeq` will give use counts or fragments per million reads (CPM/FPM). **WARNING** Do NOT ever use these counts for differential expression testing. Both `DESeq` and `edgeR` assume raw counts when doing differential expression and compensate accordingly.
+
+```{r, fig.width = 5, fig.height = 5}
+# have to calculate normalization factors first
+dds_3cond <- estimateSizeFactors(dds_3cond)
+
+# get the normalized counts
+fpm(dds_3cond) %>%
+  as.data.frame() %>%
+  rownames_to_column('ensembl_gene_id') -> norm_counts
+
+# look at results and compare to unnormalized counts
+counts(dds_3cond) %>% head()
+norm_counts
+
+# save for later
+# write_tsv(norm_counts, 'chr21_norm_fpm_wide.tsv')
+```
+
+<br>
+
+### Hierarchical Clustering
+
+The first way we're going to visualize the similarity between our samples is by creating a tree illustrating it using hierarchical clustering.
+
+```{r}
+# calculate the distances and clustering for the tree
+norm_counts %>% 
+  column_to_rownames('ensembl_gene_id') %>%
+# Whatever you want to visualize on the branches needs to be on the rows of the
+# table, so swap rows and columns
+  t() %>% 
+# hclust() requires the distance between samples to be precalculated
+  dist(.) %>% 
+# calculate the clustering
+  fastcluster::hclust() %>%
+# transforms the hclust object into the dendrogram class for tree structures
+  as.dendrogram() %>%
+# From the ggdendro package, a helper function that transforms the dendrogram 
+# object into a group of tables that can be used to plot the tree with ggplot
+  dendro_data() -> clust_dds
+
+# with the ggdendro plotting function
+ggdendrogram(clust_dds)
+```
+
+---
+
+Plot it with modifications using `ggplot2`. We're going to add color to the sample names and play with scale
+
+```{r}
+# rewrite the label table from the ggdendro object so you can add a column to 
+# color by
+clust_dds$labels %>% 
+  mutate(treatment = str_remove_all(label, '[0-9]'),
+         y = -25) -> clust_labels
+
+# plot with ggplot2
+ggplot() +
+  geom_segment(data = clust_dds$segments, 
+               aes(x = x, y = y, xend = xend, yend = yend)) +
+  geom_text(data = clust_labels, 
+            aes(x = x, y = y, label = label, color = treatment), 
+            vjust = 1.2, size = 6) +
+  scale_color_manual(values = c('gold3', 'hotpink3', 'cyan4')) +
+  coord_cartesian(ylim = c(-100, max(clust_dds$segments$yend))) +
+  theme_classic() +
+  theme(legend.position = 'none',
+        axis.title = element_blank(), 
+        axis.line = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank())
+```
+
+<br>
+
+### PCA
+
+For our second check, we'll use Principal Component Analysis (PCA) to see how well our observed variation corresponds with our variables of interest. We'll do this in 2 ways, first using the built-in functions that `DESeq2` has for PCA analysis and second using standard R functions.
+
+<br>
+
+#### `DESEq2` Functions
+
+`DESeq2` doesn't have a separate function for calculating the PCA, it calculates and plots it in a single step. However, we can't use our previously normalized counts, `DESeq` requires that we use variance stabilized counts (VSD).
+
+```{r}
+# calculate variance stabilizing transformation 
+vsd <- varianceStabilizingTransformation(dds_3cond, blind = FALSE)
+
+# use the DESeq function to plot PCA
+plotPCA(vsd, intgroup = 'treatment')
+
+# this is a ggplot object, so we can modify it like a normal ggplot
+plotPCA(vsd, intgroup = 'treatment') +
+  geom_point(size = 6, alpha = 0.75) +
+  scale_color_manual(values = c('gold3', 'hotpink4', 'cyan4')) +
+  theme_classic()
+```
+
+<br>
+
+#### Standard R Functions
+
+While technically data should be normally distributed before calculating the PCA, it can be done without normalization. If you're curious about the di1fferences (usually minimal and definitely neglible for this data), you can can install the `glmpca` package and calculate the PCA using `glmpca::glmpca()` which explicitly corrects for non-normally distributed data.
+
+```{r, fig.height = 2, fig.width = 2}
+# Calculate the PCA
+norm_counts %>%
+  column_to_rownames('ensembl_gene_id') %>%
+  t() %>%
+  prcomp() -> pca
+
+pca %>% broom::augment()
+
+# plot
+pca$x %>%
+  as.data.frame() %>%
+  rownames_to_column('sample_id') %>%
+  mutate(treatment = str_remove_all(sample_id, '[0-9]')) %>%
+
+ggplot(aes(x = PC1, y = PC2)) +
+  geom_point(aes(color = treatment), size = 6) +
+  scale_color_manual(values = c('gold3', 'hotpink4', 'cyan4')) +
+  theme_classic(base_size = 16) +
+  theme(legend.position = 'top')
+
+pca$rotation %>% as.data.frame() %>% arrange(desc(PC1))
+```
+
+<br>
+
+---
+
+<br>
+
+## Differential Expression
+
+### Calculate differential expression
+
+`DESeq2` calculates differential expression by fitting a negative bionomial generalized linear model with the design you gave the object in the treatment argument. Corrects for multiple testing using the Benjamini-Hotchberg (BH) correction.
+
+#### For 2 Conditions
+
+To run differential expression, just use the function `DESeq()`
+
+```{r}
+dds_2cond <- DESeq(dds_2cond)
+```
+
+To get the results, use `results()`
+
+```{r}
+results(dds_2cond) %>%
+  as.data.frame()
+```
+
+<br>
+
+### For More than 2 Conditions
+
+To run differential expression testing, use the same command
+
+```{r}
+dds_3cond <- DESeq(dds_3cond)
+```
+
+To get the results for more than 2 conditions you have to specify the contrasts, aka what samples you want to test
+
+```{r}
+metadata_3cond %>% distinct(treatment)
+
+### column name, 
+# SF3B1 inhibition
+results(dds_3cond, contrast = c('treatment', 'siSF', 'siC')) %>%
+  as.data.frame()
+
+# DAC treatment
+results(dds_3cond, contrast = c('treatment', 'dac', 'siC')) %>%
+  as.data.frame()
+```
+
+Save results
+
+```{r}
+# SF3B1 Inhibition
+results(dds_3cond, contrast = c('treatment', 'siSF', 'siC')) %>% 
+  as.data.frame() %>%
+  rownames_to_column('ensembl_gene_id') %>%
+  mutate(treatment = 'siSF') %>%
+  select(treatment, everything()) -> chr21_siSF_results
+
+# DAC treatment
+results(dds_3cond, contrast = c('treatment', 'dac', 'siC')) %>%
+  as.data.frame() %>%
+  rownames_to_column('ensembl_gene_id') %>%
+  mutate(treatment = 'dac') %>%
+  select(treatment, everything()) -> chr21_dac_results
+
+# write the results
+# rbind(chr21_siSF_results, chr21_dac_results) %>%
+#   write_tsv('chr21_rnaseq_diff_exp.tsv')
+```
+
+
+
+
+<br><br>
+

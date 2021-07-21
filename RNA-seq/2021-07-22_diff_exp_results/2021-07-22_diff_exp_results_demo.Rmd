@@ -1,0 +1,295 @@
+---
+title: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+library(vroom)
+
+library(ggupset)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<br><br>
+
+# 2021-07-20 Introduction to Differential Expression with `DESEq2`: Wrangling and Visualizing Differential Expression Results
+
+We will be conducting differential expression analysis with the goal of identifying genes that have changed their activity in response to some perturbation (in our example data, treatment with DAC or treament with ) using the R Bioconductor package `DESeq2`. `DESeq2` is a popular and user-friendly package to perform differential expression using negative binomical generalized linear models. This lesson will cover the basics, but for more details you can check the `DESeq2` Vignette <https://bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html#annotating-and-exporting-results>
+
+Today we'll focus on visualizing and wrangling our differential expression data.
+
+---
+
+The data we have been using for this RNA-seq tutorial is from a former PhD student in the lab, Sandra Deliard. We have two sets of triplicates both in YB5 cells, control (siC) and treated with DAC (dac) or small interfering RNAs. DAC is a DNA methyltransferase inhibitor (DNMT) and treatment with it results in global hypomethylation and increased expression. Details for the sample names are given in the table below. Small interfering RNAs that are complementary to an mRNA transcript can be used to inhibit a particular protein, preventing it from being transcribed. Three samples were treated with siRNAs against SF3B1, which is a splicing factor part of several complexes that are resposible for the alternative splicing step of making mature mRNAs.
+
+| Sample ID | treatment | replicate |
+| --- | --- | --- |
+| siCl | control | 1 |
+| siC2 | control | 2 |
+| siC3 | control | 3 |
+| dac1 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 1 |
+| dac2 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 2 |
+| dac3 | 5-aza-2'-deoxyctyidine, aka decitabine, DAC | 3 |
+| siSF1 | small interfering RNA inhibition of SF3B1 | 1 |
+| siSF2 | small interfering RNA inhibition of SF3B1 | 2 |
+| siSF3 | small interfering RNA inhibition of SF3B1 | 3 |
+
+---
+
+<br>
+
+## Install Packages
+
+If you don't have any of the necessary packages installed, uncomment the install lines in the chunk below and install them.
+
+```{r}
+### AnnotationDbi
+# Bioconductor package that interfaces between R and Bioconductor's SQLite-based 
+# biological data annotation packages
+#BiocManager::install("AnnotationDbi")
+
+### org.Hs.eg.db
+# Bioconductor package that contains the current human (Hs) annotations; if you
+# want annotations for a different version of the reference genome, you need a 
+# different package 
+#BiocManager::install("org.Hs.eg.db")
+
+### ggrepel
+# Extension for ggplot2 that allows for more intelligent label plotting
+#install.packages("ggrepel")
+
+### ggupset
+# Extension for ggplot2 that allows making upset plots
+#install.packages("ggupset")
+```
+
+<br>
+
+---
+
+<br>
+
+#### SIDEBAR: Conflicted is really useful, but not if people wrote their packages poorly
+
+To use a function from another package you can either load the library, `library(packageName)` and then call the function `function()` or use `package::function()` to use a function from any installed package without loading the package library. Many libraries use the same names for functions, like `stats::filter()` and `dplyr::filter()` and if you have both packages loaded, R can get confused about which package you want to use `filter()` from. That's why we've been using the `conflicted` package; it allows you to set a preference for which function to use and explicitly tells you when there's a conflict and what functions from what packages are conflicting <https://github.com/r-lib/conflicted>
+
+Package developers should call all their functions using `package::function()` notation, but if they don't and you set a preference with `conflicted` that's different then the function their package uses the function won't run correctly because it will get stuck using the function from the wrong package. `AnnotationDbi` has many conflicts and does not play well with other packages, which is why we're not using `conflicted` today and why we aren't loading the package.
+
+```{r, fig.width = 4, fig.height = 3}
+### using function() and package::function() are equivalent if the library's
+### loaded
+# function()
+iris %>% filter(Species == 'setosa')
+# package::fuction()
+iris %>% dplyr::filter(Species == 'setosa')
+
+### You can call a function from a non-loaded package and use it normally if you
+### use the package::function()
+ggplot(iris, aes(x = Sepal.Width, y = Sepal.Length)) +
+  geom_point(aes(color = Species)) +
+# call viridis scale without loading package
+  viridis::scale_color_viridis(discrete = T) +
+  theme_bw()
+```
+
+<br>
+
+### Annotating Genomic Data
+
+We have gene names in our results, but it wouldn't be nice to have human readable gene names? Our gene names are currently given as Ensembl IDs. However, the HUGO Gene Nomenclature Committee sets standard human readable gene names that we're going to add to our data, so we can look at the differentally expressed genes and get an idea of what's affected. Bioconductor has the `AnnotationDbi` package, which is an interface to query Bioconductor's SQLite-based annotation data packages. Here we'll use `AnnotationDbi` functions to query the `org.Hs.eg.db` package, which has the human genome annotations
+
+---
+
+Read in the 3 condition differential expression results back in from yesterday.
+
+```{r}
+read_tsv('chr21_rnaseq_diff_exp.tsv') %>%
+  mutate(ensembl_gene_id = str_remove(ensembl_gene_id, '\\.[0-9]*')) -> diff_exp
+```
+
+Pull down the gene names from the annotation package.
+
+```{r}
+# check which annotations are available.
+AnnotationDbi::columns(org.Hs.eg.db::org.Hs.eg.db)
+# if you want the mouse database, swap Mm for HS
+#org.Mm.eg.db
+
+# use the Ensembl IDs to find the corresponding HGNC IDs
+AnnotationDbi::mapIds(org.Hs.eg.db::org.Hs.eg.db, 
+# giving the ensembl IDs
+       keys = unique(diff_exp$ensembl_gene_id), 
+# want to get the gene SYMBOL for the ENSEMBL ids we already have
+       column = 'SYMBOL',
+       keytype = 'ENSEMBL',
+# There is more than one possible gene name for each symbol because humans suck,
+# so specifying we want the first most common one
+       multiVals = 'first') %>% 
+# This returns a named vector; enframe() transforms it into a table
+  enframe(name = 'ensembl_gene_id', value = 'gene') -> gene_names
+```
+
+Wrangle the differential expression result object to get a rectangular table.
+
+```{r}
+diff_exp %>% 
+# Join in the HGNC gene names
+  left_join(gene_names, by = 'ensembl_gene_id') %>%
+# Reorder for readability
+  dplyr::select(gene, ensembl_gene_id, everything()) %>%
+# Add columns indicating statistical significance and logging p-values; this 
+# will be useful in a minute when we plot the results.
+  mutate(sig = ifelse(padj < 0.05 & log2FoldChange >= 1, 
+                      'sig', 'notsig'),
+         direction = ifelse(log2FoldChange < 0, 'downregulated', 'upregulated'),
+         log_qvalue = -log10(padj)) %>%
+# NA is assigned to p-values that are outliers, replace in the log_qvalue 
+# column with the nonsignificant 0
+  replace_na(list(sig = 'notsig', log_qvalue = 0)) -> diff_exp_tbl
+```
+
+Save the annotated table
+
+```{r}
+# write_tsv(diff_exp_tbl, 'diff_exp_annotated.tsv')
+
+# read back in later if necessary
+# read_tsv('diff_exp_annotated.tsv') -> diff_exp_tbl
+```
+
+<br>
+
+---
+
+<br>
+
+## Visualize Results
+
+### MA Plot
+
+An MA plot is a type of scatterplot with average values plotted on the x-axis and the difference in values plotted on the y-axis. As standard for RNA-seq, here we'll plot the mean expression count on the x-axis and the log2 fold change in expression on the y-axis for each gene. This lets us examine how gene expression changed between groups relative to their overall expression.
+
+```{r, fig.width = 6, fig.height = 3}
+# want to know how many genes we detected in order to calculate percentages
+length(unique(diff_exp_tbl$ensembl_gene_id)) -> genes_detected
+
+# Create labels for the number and percentage of significantly up- and down- 
+# regulated genes
+diff_exp_tbl %>% 
+# count how many genes are significantly changing expression in each direction
+  group_by(direction, treatment, sig) %>%
+  dplyr::count() %>%
+  ungroup() %>%
+# if there is missing combinations complete will fill it in
+  complete(direction, treatment, sig, fill = list(n = 0)) %>%
+  filter(sig == 'sig') %>%
+# paste0 combines 
+  mutate(label = paste0(n, ', ', round((n / genes_detected), 1), '%'),
+# get the position of these labels right by plotting and adjust the numbers is
+# it doesn't look go
+         baseMean = 7500,
+         log2FoldChange = rep(c(-3, 4), each = 2)) -> ma_labels
+
+# plot
+ggplot(diff_exp_tbl, aes(x = baseMean, y = log2FoldChange)) +
+  geom_point(aes(color = sig)) +
+  scale_color_manual(values = c('gray30', 'firebrick3')) +
+  geom_hline(yintercept = 0, color = 'gray60', linetype = 'dashed') +
+  geom_text(data = ma_labels, aes(label = label), size = 8) +
+  facet_wrap(~ treatment) +
+  labs(x = 'Mean Expression (Counts)', y = 'Log2 Fold Change') +
+  coord_cartesian(ylim = c(-7, 7)) +
+  theme_classic() +
+  theme(legend.position = 'none')
+```
+
+<br>
+
+### Volcano Plot
+
+A volcano plot is a type of scatterplot with the difference in values plotted on the x-axis and the significance of those values plotted on the y-axis. As standard for RNA-seq, here we'll plot the log2 fold change in expression on the x-axis and the negative log10 corrected p-values (q-values) on the y-axis for each gene. We plot negative log10 significance values for better visualization because now the most signficant values appear at the top of the plot. The volcano plot highlights the most significant most change values.
+
+```{r, fig.width = 8, fig.height = 4}
+# Create labels for the number and percentage of significantly up- and down- 
+# regulated genes
+diff_exp_tbl %>% 
+  group_by(direction, treatment, sig) %>%
+  dplyr::count() %>%
+  ungroup() %>%
+  complete(direction, treatment, sig, fill = list(n = 0)) %>%
+  filter(sig == 'sig') %>%
+  mutate(label = paste0(n, ', ', round((n / genes_detected), 1), '%'),
+# same as the previous labels up until here and the only change is that the names
+# of the columns have to be the same as the names of the columns you're plotting
+# in the volcano plot this time
+         log2FoldChange = rep(c(-5, 5), each = 2),
+         log_qvalue = 35) -> volc_labels
+
+# plot
+# If you want to plot labels with gene names for the significant genes (don't 
+# recommend all of the them normally, maybe the top ones, because there will be
+# too many) make another column with the gene names you want to plot and nothing
+# for the genes you don't want to plot. Make sure you have the ggrepel package
+# installed.
+diff_exp_tbl %>%
+  mutate(gene_label = ifelse(sig == 'sig', gene, '')) %>%
+
+ggplot(aes(x = log2FoldChange, y = log_qvalue)) +
+  geom_point(aes(color = sig)) +
+  scale_color_manual(values = c('gray30', 'firebrick3')) +
+  geom_hline(yintercept = -log10(0.05), color = 'gray60', linetype = 'dashed') +
+  geom_vline(xintercept = c(-1, 1), color = 'gray60', linetype = 'dashed') +
+# ggrepel::geom_text_repel will plot labels only for the non-blank values and
+# will arrange them on the plot so they don't overlap
+  ggrepel::geom_text_repel(aes(label = gene_label)) +
+  geom_text(data = volc_labels, aes(label = label), size = 8) +
+  facet_wrap(~ treatment) +
+  labs(x = 'Log2 Fold Change', y = '-Log10 QValue') +
+# it's best to have symmetrical axes, so force it
+  coord_cartesian(xlim = c(-8, 8)) +
+  theme_classic(base_size = 14) +
+  theme(legend.position = 'none')
+```
+
+<br>
+
+### Comparing Different Treatments Using UpSet Plots
+
+One question you have when you test for multiple conditions, is do the same genes change under all of my conditions? An UpSet plot visualizes the intersection of sets; it's an alternative to venn diagrams, especially useful when you have more than 3 sets. The bars of the UpSet plot show the number of features that overlap between the given sets. The sets are listed on the bottom left and the dots and lines indicate what sets are represented in the given bar. UpSet plot paper <https://ieeexplore.ieee.org/document/6876017> and `ggupset` package documention <https://github.com/const-ae/ggupset>
+
+```{r, fig.width = 3, fig.height = 3}
+### arrange the data for the upset plot
+diff_exp_tbl %>%
+  filter(sig == 'sig') %>%
+  select(ensembl_gene_id, treatment) %>%
+  group_by(ensembl_gene_id) %>%
+  summarize(treatment = list(treatment)) %>%
+  ungroup() -> sig_genes
+
+### plot
+ggplot(sig_genes, aes(x = treatment)) +
+# plot bars, necessary for the upset plot
+  geom_bar() +
+# add numbers to the tops of the bars saying how many features are in the bar
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -1) +
+# scale_x_upset() makes the bars work correctly and adds the intersections
+# below the plot
+  scale_x_upset() +
+# make the y-axis taller because it cuts off the numbers on the taller bars at
+# the default height
+  scale_y_continuous(lim = c(0, 10)) +
+  labs(x = '') +
+  theme_classic()
+```
+
+
+
+
+<br><br>
+
+
+
+

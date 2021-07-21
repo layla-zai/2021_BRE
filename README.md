@@ -133,7 +133,7 @@ Today's Assignment: **Statistics and broom** [Rmarkdown](R/2021-07-13_statistics
 
 <br>
 
-Today's Assignment: **Clustering** [Rmarkdown](R/2021-07-14_clustering/2021-07-14_clustering_assignment.Rmd) and the [data](R/2021-07-14_clustering/data.zip)
+Today's Assignment: **Clustering** [Rmarkdown](R/2021-07-14_clustering/2021-07-14_clustering_assignment.Rmd) and the [data](R/2021-07-14_clustering/data.zip), ANSWER KEY in [Rmarkdown](R/2021-07-14_clustering/2021-07-14_clustering_assignment_ANSWERKEY.Rmd) 
 
 ---
 
@@ -150,7 +150,7 @@ Today's Assignment: **Clustering** [Rmarkdown](R/2021-07-14_clustering/2021-07-1
 
 <br>
 
-Today's Assignment: **Linear Models** [Rmarkdown](R/2021-07-15_statiscs2_lm/2021-07-15_lm_assignment.Rmd) and the [data](R/2021-07-15_statiscs2_lm/data.zip)
+Today's Assignment: **Linear Models** [Rmarkdown](R/2021-07-15_statiscs2_lm/2021-07-15_lm_assignment.Rmd) and the [data](R/2021-07-15_statiscs2_lm/data.zip), ANSWER KEY in [Rmarkdown](R/2021-07-15_statiscs2_lm/2021-07-15_lm_assignment_ANSWERS.Rmd)
 
 ---
 
@@ -182,7 +182,7 @@ Today's Assignment: **Exploratory Data Analysis** [assignment](R/2021-07-16_expl
 
 <br>
 
-Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_assignment_read_cluster_rna-seq.Rmd) and the [data](RNA-seq/2021-07-20_intro_rnaseq/full_count_files.zip)
+Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_assignment_read_cluster_rna-seq.Rmd) and the [data](RNA-seq/2021-07-20_intro_rnaseq/full_count_files.zip), , ANSWER KEY in [Rmarkdown](RNA-seq/2021-07-20_intro_rnaseq/2021-07-20_assignment_read_cluster_rna-seq_ANSWERS.Rmd)
 
 ---
 
@@ -193,9 +193,27 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-20_intro_rnas
 - clustering
 - differential expression testing
 - [slides](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_clust_diff_exp.pdf)
-- demo [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_clust_diff_exp_demo.Rmd)
+- demo [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_clust_diff_exp_demo.Rmd) and with in class addtions [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_clust_diff_exp_demo_IN_CLASS.Rmd)
   - Same demo [data](RNA-seq/2021-07-20_intro_rnaseq/chr21_count_files.zip)
 
 <br>
 
 Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_assignment_clust_diff_exp.Rmd) and the same [data](RNA-seq/2021-07-20_intro_rnaseq/full_count_files.zip)
+
+---
+
+#### **July 22:** Wrangling and Visualizing RNA-seq Results
+
+- wrangling differential expression results
+- MA plots
+- volcano plots
+- UpSet plots
+- [slides](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_diff_exp_results.pdf )
+- demo [Rmd](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_diff_exp_results_demo.Rmd) <!-- and with in class addtions [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_clust_diff_exp_demo_IN_CLASS.Rmd) -->
+  - This uses the differential expression table created in yesterday's demo, but it's [here](RNA-seq/2021-07-21_clust_diff_exp/diff_exp.tsv) as well 
+
+<br>
+
+Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_assignment_rna-seq_results.Rmd) and you'll use for data the differential expression table you created with yesterday's assignment
+
+---
