@@ -209,7 +209,7 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-21_clust_diff
 - volcano plots
 - UpSet plots
 - [slides](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_diff_exp_results.pdf )
-- demo [Rmd](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_diff_exp_results_demo.Rmd) <!-- and with in class addtions [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_clust_diff_exp_demo_IN_CLASS.Rmd) -->
+- demo [Rmd](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_diff_exp_results_demo.Rmd) and with in class addtions [Rmd](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_diff_exp_results_demo_IN_CLASS.Rmd)
   - This uses the differential expression table created in yesterday's demo, but it's [here](RNA-seq/2021-07-21_clust_diff_exp/diff_exp.tsv) as well 
 
 <br>
@@ -217,3 +217,8 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-21_clust_diff
 Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_assignment_rna-seq_results.Rmd) and you'll use for data the differential expression table you created with yesterday's assignment
 
 ---
+
+#### **July 22:** Review Day
+
+- [demo](2021-07-23_review_day.Rmd )
+- demo [data](R/2021-07-16_exploratory_data_analysis/colon.csv)
