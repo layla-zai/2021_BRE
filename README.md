@@ -218,7 +218,7 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_r
 
 ---
 
-#### **July 22:** Review Day
+#### **July 23:** Review Day
 
 - [demo](2021-07-23_review_day.Rmd )
 - demo [data](R/2021-07-16_exploratory_data_analysis/colon.csv)
