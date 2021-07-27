@@ -236,3 +236,9 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_r
 
 - [assignment](RNA-seq/diff_exp_assignment/differential_expression_assignment.pdf)
 - Go to <https://docs.google.com/spreadsheets/d/1dal19nICrX4PoVzh_rjLUfnR1PmBom_JwmGS8A3uPQc/edit?usp=sharing> to sign up for a dataset and for a time to practice your RNA-seq presentation
+
+---
+
+#### **July 28** Regular Expressions (RegEx)
+
+- demo [Rmd](RNA-seq/2021-07-28_regular_expressions/2021-07-28_regular_expressions_demo.Rmd)
