@@ -228,7 +228,7 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_r
 #### **July 27:** Gene Set Enrichment Analysis
 
 - [slides](RNA-seq/2021-07-27_gene_set_enrichment_demo/2021-07-27_gene_set_enrichment.pdf)
-- demo [Rmd](RNA-seq/2021-07-27_gene_set_enrichment_demo/2021-07-27_gene_set_enrichment_demo.Rmd)
+- demo [Rmd](RNA-seq/2021-07-27_gene_set_enrichment_demo/2021-07-27_gene_set_enrichment_demo.Rmd) and with in class additions [Rmd](RNA-seq/2021-07-27_gene_set_enrichment_demo/2021-07-27_gene_set_enrichment_demo_IN_CLASS.Rmd)
 
 ---
 
