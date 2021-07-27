@@ -222,3 +222,17 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_r
 
 - [demo](RNA-seq/2021-07-23_review_day/2021-07-23_review_day.Rmd), and with in class additions [Rmd](RNA-seq/2021-07-23_review_day/2021-07-23_review_day_IN_CLASS.Rmd)
 - demo [data](R/2021-07-16_exploratory_data_analysis/colon.csv)
+
+---
+
+#### **July 27:** Gene Set Enrichment Analysis
+
+- [slides](RNA-seq/2021-07-27_gene_set_enrichment_demo/2021-07-27_gene_set_enrichment.pdf)
+- demo [Rmd](RNA-seq/2021-07-27_gene_set_enrichment_demo/2021-07-27_gene_set_enrichment_demo.Rmd)
+
+---
+
+#### **Differential Expression Assignment**
+
+- [assignment](RNA-seq/diff_exp_assignment/differential_expression_assignment.pdf)
+- Go to <https://docs.google.com/spreadsheets/d/1dal19nICrX4PoVzh_rjLUfnR1PmBom_JwmGS8A3uPQc/edit?usp=sharing> to sign up for a dataset and for a time to practice your RNA-seq presentation
