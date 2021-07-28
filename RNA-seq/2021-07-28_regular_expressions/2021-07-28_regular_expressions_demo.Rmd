@@ -83,6 +83,22 @@ In the tidyverse, the `stringr` package (loads with `library(tidyverse)`) is the
 
 ---
 
+### Regular Expression in BRE
+
+```{r}
+vroom::vroom(files, id = 'file_path', delim = '\t', comment = '#', skip = 2, 
+             col_names = c('ensembl_gene_id', 'chr', 'start', 'end', 
+                           'strand', 'length', 'count')) %>%
+  
+# Use regular expressions to get nice
+  mutate(sample_id = str_extract(file_path, '[d,s][A-z]{2,3}[0-9]'),
+         treatment = str_remove_all(sample_id, '[0-9]')) %>%
+
+  dplyr::select(-file_path) -> data
+```
+
+---
+
 ### Common Regular Expressions
 
 This section is not supposed to be comprehensive (for more options check the `stringr` and R regex cheatsheets to start). Instead we'll focus on the most commonly used and useful regex and `stringr` functions. 
