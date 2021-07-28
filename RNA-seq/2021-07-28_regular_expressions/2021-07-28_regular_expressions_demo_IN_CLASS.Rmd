@@ -1,0 +1,361 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(tidyverse)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Review: RNA-seq Result Plots
+
+Read in data
+
+```{r}
+vroom::vroom('../2021-07-21_clust_diff_exp/diff_exp.tsv') %>%
+# Reorder for readability
+  dplyr::select(ensembl_gene_id, everything()) %>%
+# Add columns indicating statistical significance and logging p-values; this 
+# will be useful in a minute when we plot the results.
+  mutate(sig = ifelse(padj < 0.05 & log2FoldChange >= 1, 
+                      'sig', 'notsig'),
+         direction = ifelse(log2FoldChange < 0, 'downregulated', 'upregulated'),
+         log_qvalue = -log10(padj)) %>%
+# NA is assigned to p-values that are outliers, replace in the log_qvalue 
+# column with the nonsignificant 0
+  replace_na(list(sig = 'notsig', log_qvalue = 0)) -> full_diff_exp_anno
+```
+
+MA plot/volcano plot - change the `base_size`, the label position, and you don't have to use my colors or my plot style
+
+```{r}
+length(unique(full_diff_exp_anno$ensembl_gene_id)) -> genes_detected
+
+full_diff_exp_anno %>% 
+  group_by(direction, treatment, sig) %>%
+  dplyr::count() %>%
+  ungroup() %>%
+  complete(direction, treatment, sig, fill = list(n = 0)) %>%
+  filter(sig == 'sig') %>%
+  mutate(label = paste0(n, ', ', round((n / genes_detected) * 100, 1), '%'),
+### change the baseMean and the log2FoldChange values
+         baseMean = 500000,
+         log2FoldChange = rep(c(-3, 4), each = 2)) -> ma_labels
+
+
+ggplot(full_diff_exp_anno, aes(x = baseMean, y = log2FoldChange)) +
+  geom_point(aes(color = sig)) +
+  scale_color_manual(values = c('gray30', 'firebrick3')) +
+  geom_hline(yintercept = 0, color = 'gray60', linetype = 'dashed') +
+  geom_text(data = ma_labels, aes(label = label), size = 8) +
+  facet_wrap(~ treatment) +
+  labs(x = 'Mean Expression (Counts)', y = 'Log2 Fold Change') +
+  coord_cartesian(ylim = c(-7, 7)) +
+# change the base_size if it's too large or too small
+  theme_classic(base_size = 20) +
+  theme(legend.position = 'none')
+```
+
+UpSet plot - again, have to change the scale
+
+```{r}
+full_diff_exp_anno %>%
+  filter(sig == 'sig') %>%
+  select(ensembl_gene_id, treatment) %>%
+  group_by(ensembl_gene_id) %>%
+  summarize(treatment = list(treatment)) %>%
+  ungroup() -> sig_genes
+
+
+ggplot(sig_genes, aes(x = treatment)) +
+  geom_bar() +
+  geom_text(stat = 'count', aes(label = ..count..), vjust = -1) +
+  ggupset::scale_x_upset() +
+  # set the upper limit MUCH higher
+  scale_y_continuous(lim = c(0, 620)) +
+  labs(x = '') +
+  theme_classic()
+```
+
+---
+
+<br>
+
+---
+
+
+## 2021-07-28: Regular Expressions
+
+Regular expressions (or regex as it's abbreviated) are a sequence of characters that specify a search pattern. You can use them for text matching in "find" and "find and replace" operations. They underlay computer functions you've used before like finding stuff in documents or on a web browser. Also when you're filling out web forms and they automatically format your input, the website is using regex to match your input. Also, while almost all programming languages have regex capabilities and the strings used are similar, details of the match syntax vary from language to language.
+
+In the tidyverse, the `stringr` package (loads with `library(tidyverse)`) is the function for applying regex to your R code! Good references: (1) The `stringr` website <https://stringr.tidyverse.org/>, the `stringr` cheatsheet <https://github.com/rstudio/cheatsheets/blob/master/strings.pdf> and the R regex cheatsheet <https://paulvanderlaken.files.wordpress.com/2017/08/r-regular-expression-cheetsheat.pdf>
+
+---
+
+### Regular Expression in BRE
+
+```{r}
+vroom::vroom(files, id = 'file_path', delim = '\t', comment = '#', skip = 2, 
+             col_names = c('ensembl_gene_id', 'chr', 'start', 'end', 
+                           'strand', 'length', 'count')) %>%
+  
+# Use regular expressions to get nice
+  mutate(sample_id = str_extract(file_path, '[d,s][A-z]{2,3}[0-9]'),
+         treatment = str_remove_all(sample_id, '[0-9]')) %>%
+
+  dplyr::select(-file_path) -> data
+```
+
+---
+
+### Common Regular Expressions
+
+This section is not supposed to be comprehensive (for more options check the `stringr` and R regex cheatsheets to start). Instead we'll focus on the most commonly used and useful regex and `stringr` functions. 
+
+---
+
+For this section we'll use this function of 20 fruits. Run the chunk so it's loaded into your environment.
+
+```{r}
+fruits <- c('Apple', 'apricot', 'ban@na', 'blueberry', 'cherry',  
+            'date2', 'Dragon Fruit', 'gra3pe', 'jack fruit',
+            'Kumquat', 'm@ngo', 'Nectarine', 'pa8paya', 'passion.fruit', 
+            'pear', 'plaintain42', 'plum', 'pineapple', 'strawberry')
+```
+
+#### Matching Exact Text
+
+To start, you can, of course, match an exact string. Be aware though that string matching is case sensitive.
+
+```{r}
+# Start with just the letter a; we'll get a back for any fruit that has it 
+# anywhere in it; notice we don't get one for "Apple"
+fruits
+cat('\n\n')
+str_extract(fruits, "a")
+
+
+# expect 3 "fruits" from Dragon Fruit, jack fruit, and passionfruit
+# notice that it doesn't matter whether the 
+fruits
+cat('\n\n')
+str_extract(fruits, "fruit")
+```
+
+Matching exact strings won't get us far. You can specify options for a certain position in the string using square brackets `[]`
+
+```{r}
+# For example, we want anything that has the string "apple" in it, whether or
+# not it's uppercase or lowercase
+# Expect 2 apples from Apple, and pineapple
+fruits
+cat('\n\n')
+str_extract(fruits, '[Aa]pple')
+
+# can list as many options as you want
+fruits
+cat('\n\n')
+str_extract(fruits, '[@38w]')
+```
+
+#### Matching Categories
+
+**Letters:** You can match any letter using `[A-z]` or `[:alpha:]`. These options will take any letter regardless of punction. Notice too, that they only take the first letter in each fruit; how to match multiples is in a few chunks.
+
+```{r}
+# Match any letter
+fruits
+cat('\n\n')
+str_extract(fruits, '[A-z]')
+
+# or you can do the same thing with [:alpha:]
+fruits
+cat('\n\n')
+str_extract(fruits, '[:alpha:]')
+```
+
+**Numbers:** You can match any number with `[0-9]` or `[:digit:]`.
+
+```{r}
+# match any number
+fruits
+cat('\n\n')
+str_extract(fruits, '[0-9]')
+
+# or you can use [:digit:] for the same results
+fruits
+cat('\n\n')
+str_extract(fruits, '[:digit:]')
+```
+
+**Other:** Two miscellaneous things you might want to match regularly. You can match spaces (which actually matches spaces, tabs, and all types of returns) using `[:space:]`. You can match any punctuation character with `[:punct:]`. I more commonly use these to get rid of unwanted characters in my strings.
+
+```{r}
+# for space, tab, enter respectively, \s, \t, \n
+# match spaces
+fruits
+cat('\n\n')
+str_extract(fruits, '[:space:]')
+
+# match punctuation
+fruits
+cat('\n\n')
+str_extract(fruits, '[:punct:]')
+```
+
+#### Wildcards
+
+Wildcards are placeholder characters that stand in for a more complicated concept in text matching.
+
+---
+
+**Location in the String:** We can match text at the start of a string with `^` or at the end of a string with `$`
+
+```{r}
+# match anything starting with 'A', 'a', or 'p' at the beginning of the string
+# Notice ^ must go at the start
+fruits
+cat('\n\n')
+str_extract(fruits, '^[Aap]')
+
+# match anything ending with 't' or 'a'
+# Notice $ must go at the end
+fruits
+cat('\n\n')
+str_extract(fruits, '[ta]$')
+```
+
+**Anything:** Frequently, you have some text you want to match very specifically and some where any of the possible text is fine. You can use a period `.` to stand for for any single character `.`
+
+```{r}
+# If we just use a period, we get the first character of every fruit
+fruits
+cat('\n\n')
+str_extract(fruits, '.')
+
+# If we specify a . with anything else, we get the following character after our
+# match along with it
+fruits
+cat('\n\n')
+str_extract(fruits, '[Aa].')
+```
+
+**How Many Times the Pattern Matches:** Specify number of matches with `{}` or one or more matches with `+`
+
+```{r}
+# match exactly 2 times
+fruits
+cat('\n\n')
+str_extract(fruits, '[pr]{2}')
+
+# or you can say 1 or 2 times
+fruits
+cat('\n\n')
+str_extract(fruits, '[pr]{1,2}')
+
+# remember our numbers didn't get the 42 at the end of 'plantain42'? You have 
+# to specify that you want all the numbers by adding a specific number with {}
+# or using +
+fruits
+cat('\n\n')
+str_extract(fruits, '[0-9]+')
+
+# you can also just get any characters any number of times using .+
+fruits
+cat('\n\n')
+str_extract(fruits, '.+')
+
+# 
+fruits
+cat('\n\n')
+str_extract(fruits, '^[p].+')
+```
+
+**Escaping:** The backslash `\` is used to "escape" special wildcards. When used in conjunction with a wildcard, the wildcard will be evaluated as its literal symbol, not a special character. Unfortunately, `\` also must be escaped since it's a special character used in strings, so we have to use two slashes for escape `\\`.
+
+```{r}
+# If you just try and get a period, it will be interpreted as "match the first
+# character like above"
+fruits
+cat('\n\n')
+str_extract(fruits, '.')
+
+# Can't just use one forward slash in R with 
+fruits
+cat('\n\n')
+str_extract(fruits, '\.')
+
+# Must escape the escape
+fruits
+cat('\n\n')
+str_extract(fruits, '\\.')
+```
+
+---
+
+<br>
+
+---
+
+### `stringr` Functions
+
+For this part of the demo, we'll use our demo RNA-seq file names. This is the most common way I use regular expressions day-to-day as you can see from our other demos. Obviously with only 9 samples, it would be easy to just type the information in, but if there are hundreds or thousands or samples you're not going to be doing it manually.
+
+```{r}
+tibble(file_name = c('dac1_chr21_counts.txt', 'dac2_chr21_counts.txt', 
+                     'dac3_chr21_counts.txt',
+                     'siC1_chr21_counts.txt', 'siC2_chr21_counts.txt', 
+                     'siC3_chr21_counts.txt',
+                     'siSF1_chr21_counts.txt', 'siSF2_chr21_counts.txt', 
+                     'siSF3_chr21_counts.txt')) -> metadata
+```
+
+---
+
+`str_remove()` This function deletes or *removes* the text matching the string. We'll use this to get just the sample names from the file names
+
+```{r}
+metadata %>%
+  mutate(sample_id = str_remove(file_name, '_chr21_counts.txt'))
+
+# can also get condition
+metadata %>%
+  mutate(sample_id = str_remove(file_name, '_chr21_counts.txt'),
+         condition = str_remove(sample_id, '[0-9]')) -> metadata_updated
+```
+
+`str_extract()`, which we've been using, takes only the match string. As you can see, we can use this to get the sample IDs as well, although the regex is more complicated in this case. A lot of these functions can be used for the same task, it's just that some functions have easier solutions than others
+
+```{r}
+metadata %>%
+  mutate(sample_id = str_extract(file_name, '^[ds][A-z]+[0-9]'))
+```
+
+`str_detect()` returns whether or not the match is present. Suppose that the third samples, dac3, siC3, and siSF3 were done in a separate sequencing batch from the others and we wanted to add information in as an additional column. String matching will make that easy.
+
+```{r}
+### simple example
+metadata_updated$sample_id
+cat('\n')
+str_detect(metadata_updated$sample_id, '3')
+
+### very useful for filtering
+metadata_updated %>%
+  filter(str_detect(sample_id, '3'))
+
+### in combination with mutate to add on another column
+metadata_updated %>%
+  mutate(fake_batch = ifelse(str_detect(sample_id, '3'), 'batchB', 'batchA'))
+```
+
+`str_replace()` replaces the matched string with another string of your choosing. Perhaps I don't want to label the control as 'siC', I want it to read 'control'. We can easily replace that.
+
+```{r}
+metadata_updated %>%
+  mutate(sample_id = str_replace(sample_id, 'siC', 'control'))
+```
+
+
+

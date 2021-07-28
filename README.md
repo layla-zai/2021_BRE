@@ -241,4 +241,5 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_r
 
 #### **July 28** Regular Expressions (RegEx)
 
-- demo [Rmd](RNA-seq/2021-07-28_regular_expressions/2021-07-28_regular_expressions_demo.Rmd)
+- demo [Rmd](RNA-seq/2021-07-28_regular_expressions/2021-07-28_regular_expressions_demo.Rmd) and with in class additions [Rmd](RNA-seq/2021-07-28_regular_expressions/2021-07-28_regular_expressions_demo_IN_CLASS.Rmd)
+- R Cheat Sheets <https://www.rstudio.com/resources/cheatsheets/>
