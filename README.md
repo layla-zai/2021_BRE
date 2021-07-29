@@ -198,7 +198,7 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-20_intro_rnas
 
 <br>
 
-Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_assignment_clust_diff_exp.Rmd) and the same [data](RNA-seq/2021-07-20_intro_rnaseq/full_count_files.zip)
+Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_assignment_clust_diff_exp.Rmd) and the same [data](RNA-seq/2021-07-20_intro_rnaseq/full_count_files.zip) and the ANSWER KEY in [Rmarkdown](RNA-seq/2021-07-21_clust_diff_exp/2021-07-21_assignment_clust_diff_exp_ANSWERS.Rmd)
 
 ---
 
@@ -214,7 +214,7 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-21_clust_diff
 
 <br>
 
-Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_assignment_rna-seq_results.Rmd) and you'll use for data the differential expression table you created with yesterday's assignment
+Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_assignment_rna-seq_results.Rmd) and you'll use for data the differential expression table you created with yesterday's assignment and here's the ANSWER KEY in [Rmarkdown](RNA-seq/2021-07-22_diff_exp_results/2021-07-22_assignment_rna-seq_results_ANSWERS.Rmd)
 
 ---
 
@@ -244,3 +244,9 @@ Today's Assignment: **Read in RNA-seq Data** [Rmd](RNA-seq/2021-07-22_diff_exp_r
 
 - demo [Rmd](RNA-seq/2021-07-28_regular_expressions/2021-07-28_regular_expressions_demo.Rmd) and with in class additions [Rmd](RNA-seq/2021-07-28_regular_expressions/2021-07-28_regular_expressions_demo_IN_CLASS.Rmd)
 - R Cheat Sheets <https://www.rstudio.com/resources/cheatsheets/>
+
+---
+
+#### **July 29** Example RNA-seq Results Presentation
+
+- exmample presentation [pdf](RNA-seq/diff_exp_assignment/example_presentation.pdf)
