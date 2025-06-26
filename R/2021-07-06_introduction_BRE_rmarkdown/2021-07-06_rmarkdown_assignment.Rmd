@@ -54,7 +54,7 @@ You should have gotten the same output for all three chunks.
 Comment out the code in the chunk below.
 
 ```{r}
-image(volcano)
+#image(volcano)
 ```
 
 <br>
@@ -72,7 +72,9 @@ Remember, to create a code chunk
 Make your own code chunk in the space below, and then copy the code between backticks `image(volcano)` and try running it.
 
 
-
+```{r}
+image(volcano)
+```
 
 
 
@@ -85,51 +87,51 @@ For the lines of text below, add the appropriate symbols to make the text what i
 
 ---
 
-Make me bold
+**Make me bold**
 
 ---
 
-Make me italicized
+*Make me italicized*
 
 ---
 
-Make me a header (whatever size you want)
+##Make me a header (whatever size you want)
 
 ---
 
-Make me a different size of header (just not the same as the line above)
+####Make me a different size of header (just not the same as the line above)
 
 ---
 
 Make the stuff below into an unordered list.
 
-satsuma
-tomato
-plum
-star fruit
-cherry
+- satsuma
+- tomato
+- plum
+- star fruit
+- cherry
 
 ---
 
 Make the stuff below into an ordered (numbered) list.
 
-banana
-pineapple
-apricot
-grape
-pomegranate
+1. banana
+2. pineapple
+3. apricot
+4. grape
+5. pomegranate
 
 ---
 
 Format the code below so it will appear as inline code.
 
-image(volcano)
+`image(volcano)`
 
 ---
 
 Go to Tools > Global Options and take a screenshot confirming "Save .RData on exit:" is set to **Never**. Add a link to the picture below so it will appear when you knit the document.
 
-
+![Link to the picture of RStudio settings](R_screenshot_practice.png)
 
 ---
 
