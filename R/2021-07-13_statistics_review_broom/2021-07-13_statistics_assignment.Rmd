@@ -32,42 +32,45 @@ For this section, use the given statistical test to answer the question. Put the
 
 1. Using the built-in `mtcars` dataset, if you have a particular engine shape (`vs`) do you have an equal chance of having either type of transmission (`am`)? Use a chi-square test.
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is no association between engine shape and transmission. 
 
 ```{r}
-
+chisq.test(mtcars$vs, mtcars$am)
 ```
 
 2. Using the built-in `mtcars` dataset, is there an association between the number of gears (`gear`) a car has and it's fuel efficiency (`mpg`)? Test the question using an ANOVA.
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is a statistically significant difference in fuel efficiency bewteen cars with 3 and 4 gears, but there is no significant difference between cars with 3 and 5 gears or between 4 and 5 gears. 
 
 ```{r}
+aov(mpg ~ as.factor(gear), data = mtcars) %>% 
+  TukeyHSD() %>%
+  tidy()
 
 ```
 
 3. The average 18 wheeler truck has a horsepower of 400 (fact courtesy of dubious Googling). Compare this number to the data for personal vehicles in `mtcars`. Is their horsepower different from the mean 400 hp of an 18 wheeler? Use a t-test to answer the question.
 
-*TYPE YOUR CONCLUSION HERE*
+*TYPE YOUR CONCLUSION HERE* The horsepower of personal vehicles is signficantly different from the horsepower of an 18 wheeler truck. 
 
 ```{r}
-
+t.test(mtcars$hp, mu = 400) %>% tidy()
 ```
 
 4. Is there a difference in horsepower (`hp`) between cars with automatic vs manual transmissions (`am`)? Test the question using a t-test.
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is not a significantly significant difference between cars with automatic versus manual transmissions. 
 
 ```{r}
-
+mtcars %$% t.test(hp ~ am) %>% tidy()
 ```
 
 5. Using the built-in `mtcars` dataset, is there an association between the number of carburetors (`carb`) a car has and it's fuel efficiency (`mpg`)? Test the question using a linear model. Make sure to include the direction of the association in your answer.
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is a statistically significant difference between the number of carburetors a car has and its fuel efficiency. As the number of carburetos increases, the fuel efficiency will decrease.
 
 ```{r}
-
+lm(mpg ~ carb, data = mtcars) %>% tidy()
 ```
 
 ### Pick the Appropriate Statistical Test
@@ -86,49 +89,58 @@ In this section, you'll have to pick the appropriate statistical test to answer 
 - **Color** = wine color (spectrophotometric measure?)
 
 ```{r}
-
+dir('data')
+read_tsv('data/data/wine.tsv') -> wine
 ```
 
 ---
 
 6. Is there an association between malic acid and flavanoid content?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is a significant association between malic acid and flavanoid content. 
 
 ```{r}
-
+lm(MalicAcid ~ Flavanoids, data = wine) %>% tidy()
 ```
 
 7. Is there a difference in color between cultivars 1 and 2?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is a statistically significant difference in their colors. 
 
 ```{r}
-
+wine %>%
+  filter(Cultivar != 3) %>%
+  mutate(Cultivar = as.character(Cultivar)) %$% 
+  t.test(Color ~ Cultivar) %>%
+  tidy()
 ```
 
 8. Is there a difference in magnesium content between the three different cultivars?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is a significant difference in magnesium content between cultivar 1 and Cultivar 2 or 3, but there is no significant difference between cultivars 2 and 3.
+
 
 ```{r}
-
+aov(Magnesium ~ as.factor(Cultivar), data = wine) %>% TukeyHSD() %>% tidy()
 ```
 
 9. Is there a difference in the average color of cultivar 3 compared the mean color of cultivar 1, 5.5?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is a statistically significant difference in the average color of cultivar 3 compared to the mean color of cultivar 1.
 
 ```{r}
-
+wine %>% 
+  filter(Cultivar == 3) %$% 
+  t.test(Color, mu = 5.5) %>%
+  tidy()
 ```
 
 10. Is there a difference in ash content between the three cultivars?
 
-*TYPE YOUR CONCLUSION HERE*
+*TYPE YOUR CONCLUSION HERE* There is a statistically significant difference in ash content between the three cultivars. 
 
 ```{r}
-
+aov(Ash ~ as.factor(Cultivar), data = wine) %>% TukeyHSD() %>% tidy()
 ```
 
 ### Mini Exploratory Data Analysis
@@ -140,26 +152,36 @@ In this last section, we'll do some exploratory analysis on Jelle's Marble Runs.
 11. Read in the marbles dataset, available at the link <https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-06-02/marbles.csv>
 
 ```{r}
-
+marbles <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-06-02/marbles.csv')
 ```
 
 12. Pick a variable to explore and make a plot highlighting it using `ggplot`
 
 ```{r}
-
+ggplot(marbles, aes(x = avg_time_lap)) +
+  geom_density(aes(fill = team_name)) +
+  scale_fill_viridis_d() +
+  facet_wrap(~ team_name) +
+  labs(x = 'Average Time Lap (s)') +
+  theme_classic() +
+  theme(legend.position = 'none')
 ```
 
 13. Pick a question to answer with a statistical test. Write down both your question and the test you'll use below.
 
-**Question:** TYPE YOUR QUESTION HERE 
-**Test:** TYPE THE TEST YOU PICKED HERE 
+**Question:** Is there a difference in average time laps between different teams? 
+**Test:** ANOVA
 
 14. Use the chunk below to run your statistical test. What is your conclusion?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is no stastically significant difference between the average time laps of different teams. 
 
 ```{r}
-
+anova_result <- aov(avg_time_lap ~ team_name, data = marbles) %>%
+  TukeyHSD() %>%
+  tidy() %>%
+  filter(adj.p.value < 0.05)
+summary(anova_result)
 ```
 
 
