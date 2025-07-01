@@ -50,7 +50,7 @@ In the wine dataset, Cultivar is a **categorical** variable (even though it's co
 Read in the wine dataset in the chunk below.
 
 ```{r}
-
+read_tsv('data/data/wine.tsv') -> wine
 ```
 
 #### heatmp
@@ -58,31 +58,70 @@ Read in the wine dataset in the chunk below.
 1. Plot a heatmap of the `wine` dataset. Annotate it with the cultivar of the sample.
 
 ```{r}
+wine %>% 
+  select(-Cultivar) %>% 
+  as.data.frame() %>% 
+  column_to_rownames('Sample') -> wine_nocult
 
+data.frame(Cultivar = wine$Cultivar,
+           row.names = rownames(wine_nocult)) -> wine_row_ann
+
+list(Cultivar = c('1' = 'yellow', 
+                  '2' = 'red',
+                  '3' = 'firebrick4')) -> wine_ann_colors
+
+pheatmap(wine_nocult,
+         show_rownames = F,
+         color = viridis(50),
+         cutree_cols = 2,
+         scale = 'row',
+         annotation_row = wine_row_ann,
+         annotation_colors = wine_ann_colors)
 ```
 
 2. Does the heatmap do a good job of discriminating the cultivar? Why or why not?
 
-**WRITE YOUR ANSWER HERE**
+**WRITE YOUR ANSWER HERE** The heatjob doesn't do the best job because Cultivar 1 seems too distinct from the others so most of the data shows in the Magnesium column.
 
 #### PCA
 
 3. Plot a PCA of the wine dataset. Start by plotting PC1 and PC2.
 
 ```{r}
+wine %>% select(-Sample, -Cultivar) %>% prcomp() %>% augment(wine) -> wine_pca
 
+ggplot(wine_pca, aes(x = .fittedPC1, y = .fittedPC2)) +
+  geom_point(aes(color = as.factor(Cultivar))) +
+  labs(x = 'PC1', y = 'PC2', color = 'Cultivar') +
+  theme_classic(base_size = 20)
 ```
 
 4. Does the PCA do a good job of discriminating the cultivar? Why or why not?
 
-**WRITE YOUR ANSWER HERE**
+**WRITE YOUR ANSWER HERE** The PCA does an okay job but there is still a lot of overlap so the discrimination isn't very good. 
 
 5. Does any combination of the first 3 PCs do a good job of discriminating the cultivar? Can any cultivar be distinguished from the others? Why or why not? Plot the PCs in the chunk below and explain your reasoning.
 
-**WRITE YOUR ANSWER HERE**
+**WRITE YOUR ANSWER HERE** PC1 and PC2 do help separate the cultivars a bit, and PC1 and PC3 work just as well. However, using PC2 and PC3 makes it a lot easier to distinguish Cultivar 3 from the other two. 
 
 ```{r}
+# PC! vs PC2
+ggplot(wine_pca, aes(x = .fittedPC1, y = .fittedPC2)) +
+  geom_point(aes(color = as.factor(Cultivar))) +
+  labs(x = 'PC1', y = 'PC2', color = 'Cultivar') +
+  theme_classic(base_size = 20)
 
+# PC1 vs PC3
+ggplot(wine_pca, aes(x = .fittedPC1, y = .fittedPC3)) +
+  geom_point(aes(color = as.factor(Cultivar))) +
+  labs(x = 'PC1', y = 'PC3', color = 'Cultivar') +
+  theme_classic(base_size = 20)
+
+# PC2 vs PC3
+ggplot(wine_pca, aes(x = .fittedPC2, y = .fittedPC3)) +
+  geom_point(aes(color = as.factor(Cultivar))) +
+  labs(x = 'PC2', y = 'PC3', color = 'Cultivar') +
+  theme_classic(base_size = 20)
 ```
 
 #### kmeans
@@ -90,12 +129,24 @@ Read in the wine dataset in the chunk below.
 6. Run kmeans clustering with 3 clusters on the wine dataset and plot the results
 
 ```{r}
+wine %>% 
+  select(-Sample, -Cultivar) %>% 
+  kmeans(3) %>% 
+  augment(wine) -> wine_k3
 
+ggplot(wine_k3, aes(x = Magnesium, y = Alcohol)) +
+  geom_point(aes(color = .cluster, shape = as.factor(Cultivar))) +
+  theme_classic()
+
+ggplot(wine_k3, aes(x = Magnesium, y = Alcohol)) +
+  geom_point(aes(color = .cluster)) +
+  facet_wrap(~ Cultivar) +
+  theme_classic()
 ```
 
 7. Does kmeans do a good job of discriminating the cultivars? Why or why not?
 
-**WRITE YOUR ANSWER HERE**
+**WRITE YOUR ANSWER HERE** Not really, as the three cultivars have a lot of overlap. 
 
 <br>
 
@@ -121,36 +172,66 @@ The biopsy dataset contains the results of breast tumor biopsy results from 699 
 Use the chunk below to read in the biopsy table
 
 ```{r}
-
+read_csv('data/data/biopsy.csv') -> biopsy
 ```
 
 #### PCA
 
 8. Run a PCA on the biopsy dataset and plot the first two PCs. How does the PCA analysis discriminate the outcomes?
 
-**WRITE YOUR ANSWER HERE**
+**WRITE YOUR ANSWER HERE** The PCA analysis does a good job because the benign biopsies are clustered mostly to the right and separated from the malignant biopsies. 
 
 ```{r}
+biopsy %>% select(-sample_id, -outcome) %>% prcomp() %>% augment(biopsy) -> biopsy_pca
 
+ggplot(biopsy_pca, aes(x = .fittedPC1, y = .fittedPC2)) +
+  geom_point(aes(color = outcome)) +
+  theme_classic()
 ```
 
 #### kmeans
 
 9. Run kmeans clustering with two clusters on the biopsy dataset. How does kmeans clustering do to discriminate the data?
 
-**WRITE YOUR ANSWER HERE**
+**WRITE YOUR ANSWER HERE** It does a good job because there is little overlap between the different clusters. 
 
 ```{r}
+biopsy %>% 
+  select(-sample_id, -outcome) %>% 
+  kmeans(2) %>% 
+  augment(biopsy) -> biopsy_k3
 
+# plot with color and facets
+ggplot(biopsy_k3, aes(x = clump_thickness)) +
+  geom_histogram(aes(fill = .cluster), alpha = 0.5, position = 'identity') +
+  facet_wrap(~ outcome) +
+  theme_classic()
 ```
 
 #### heatmap
 
 10. Plot a heatmp using the biopsy dataset. Annotate the heatmap with the outcome. How does it do discriminating the outcomes?
 
-**WRITE YOUR ANSWER HERE**
+**WRITE YOUR ANSWER HERE** It does a good job because there's a strong difference between groups with the cancer data.
 
 ```{r}
+biopsy %>% 
+  select(-outcome) %>% 
+  column_to_rownames('sample_id') -> biopsy_noout
+
+data.frame(outcome = biopsy$outcome,
+           row.names = rownames(biopsy_noout)) -> biopsy_row_ann
+
+list(outcome = c('benign' = 'skyblue', 
+                 'malignant' = 'firebrick')) -> biopsy_ann_colors
+
+
+pheatmap(biopsy_noout,
+         show_rownames = F,
+         color = viridis(50),
+         cutree_rows = 5,
+         annotation_row = biopsy_row_ann,
+         annotation_colors = biopsy_ann_colors)
 
 ```
 
@@ -158,7 +239,7 @@ Use the chunk below to read in the biopsy table
 
 11. In your opinion, which of the three methods discriminated the outcome the best?
 
-I would say PCA because it's the most visually compelling visualization of the difference in outcomes, but they all do a good job 
+PCA because it has the clearest visual representation.
 
 <br>
 
@@ -167,7 +248,7 @@ I would say PCA because it's the most visually compelling visualization of the d
 For this last section, we'll use the `flights` table from the `nycflights13` package. There's no variable of interest here; instead we'll do an unbiased clustering analysis in a (relatively) large dataset to see if we can find anything interesting.
 
 ```{r}
-# install.packages('nycflights13')
+install.packages('nycflights13')
 library(nycflights13)
 ```
 
@@ -181,17 +262,46 @@ flights
 
 12. Pick the best number of clusters to use for kmeans clustering and explain why you picked that number below.
 
-**How many clusters will you use?**: 
-**EXPLAIN HERE WHY YOU PICKED THAT NUMBER**: 
+**How many clusters will you use?**: 7
+**EXPLAIN HERE WHY YOU PICKED THAT NUMBER**: I chose 7 because it seems to be the inflection point that occurs before the graph actually levels out too much. 
 
 ```{r}
+flights %>% 
+# drop the categorical columns
+  select(-carrier, -tailnum, -origin, -dest, -time_hour) %>% 
 
+  na.omit() -> flights_num
+
+tibble(k = 2:15) %>% 
+  mutate(kclust = map(k, ~ kmeans(flights_num, .)),
+         kclust = map(kclust, ~ glance(.))) %>%
+  unnest(kclust) -> kmeans_params  
+
+
+kmeans_params %>%
+  mutate(group = 1) %>%   
+  ggplot(aes(x = as.factor(k), y = tot.withinss, group = group)) + 
+    geom_point(size = 3) + 
+    geom_line(size = 1) + 
+    labs(x = 'Number of Clusters', y = 'Goodness of Fit\n (within cluster sum of squares)') +
+    theme_classic() +
+    theme(axis.title = element_text(size = 14))
 ```
 
 13. Run kmeans clustering with your chosen number of clusters, then visualize the kmeans with some plot.
 
 ```{r}
+flights_num %>%
+  kmeans(7) %>% 
+  augment(na.omit(flights)) -> flights_k7
 
+ggplot(flights_k7, aes(x = dep_time)) + 
+  geom_density(aes(fill = .cluster)) +
+  scale_fill_viridis_d() +
+  facet_wrap(~ .cluster) +
+  labs(x = 'Departure Time (HH:MM)') +
+  theme_classic() +
+  theme(legend.position = 'none')
 ```
 
 #### PCA
@@ -199,15 +309,35 @@ flights
 14. Calculate a PCA and plot PCs one and two fpr the flights dataset.
 
 ```{r}
+flights_num %>% 
+  prcomp(center = T, scale = F) %>% 
+  augment(na.omit(flights)) -> flights_pca
 
+ggplot(flights_pca, aes(x = .fittedPC1, y = .fittedPC2)) +
+  geom_point() +
+  labs(x = 'PC1', y = 'PC2') +
+  theme_classic()
 ```
 
 15. Now color the PCA plot by all the categorical variables with the flights dataset. Do any of them go with the patterns of variation identified by the PCA?
 
-**WRITE YOUR ANSWER HERE**
+**WRITE YOUR ANSWER HERE** "EV" is mainly separated along PC1 but the origin and destination don't show that much of a difference. 
 
 ```{r}
+ggplot(flights_pca, aes(x = .fittedPC1, y = .fittedPC2)) +
+  geom_point(aes(color = carrier)) +
+  labs(x = 'PC1', y = 'PC2') +
+  theme_classic()
 
+ggplot(flights_pca, aes(x = .fittedPC1, y = .fittedPC2)) +
+  geom_point(aes(color = origin)) +
+  labs(x = 'PC1', y = 'PC2') +
+  theme_classic()
+
+ggplot(flights_pca, aes(x = .fittedPC1, y = .fittedPC2)) +
+  geom_point(aes(color = dest)) +
+  labs(x = 'PC1', y = 'PC2') +
+  theme_classic()
 ```
 
 
