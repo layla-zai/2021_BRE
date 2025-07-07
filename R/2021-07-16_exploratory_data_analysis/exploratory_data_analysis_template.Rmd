@@ -6,6 +6,8 @@ output: html_document
 #### Load any necessary libraries here. I've already loaded the basics
 library(tidyverse)
 library(conflicted)
+library(viridis)
+library(broom)
 
 filter <- dplyr::filter
 
@@ -18,11 +20,19 @@ knitr::opts_chunk$set(echo = TRUE, fig.align ="center",
 ## Introduction
 
 Here's where you'll explain your data. Where is it from and what's a little bit of the background. Then you need to explain the columns (variables) in the dataset:
+
+This dataset comes from the TidyTuesday project from 2022-11-29, and it includes data on the FIFA Men's World Cup tournaments from 1930 through 2018. The data provides various types of information about each tournament. The columns are: 
   
-- **column1:** description
-- **column2:** description
-- **column3:** description
-- etc.
+- **year**: The year the World Cup took place.
+- **host**: The country that hosted the tournament.
+- **winner**: The country that won the tournament.
+- **second**: The runner-up country.
+- **third**: The third-place country.
+- **fourth**: The fourth-place country.
+- **goals_scored**: Total number of goals scored in the tournament.
+- **teams**: Number of teams that participated.
+- **games**: Total number of games played.
+- **attendance**: Total attendance across all matches.
 
 <br><br>
 
@@ -32,6 +42,9 @@ Describe here what you did to clean the data.
 
 ```{r}
 ### Use this chunk to read in the data and clean it
+install.packages("tidytuesdayR")
+tuesdata <- tidytuesdayR::tt_load('2022-11-29')
+worldcups <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2022/2022-11-29/worldcups.csv')
 ```
 
 <br><br>
@@ -40,24 +53,207 @@ Describe here what you did to clean the data.
 
 For each question, make a plot illustrating the question, use a statistical to answer the question, and describe your conclusions.
 
-#### Question #: WRITE YOUR QUESTION HERE
+#### Question #1: Is the year associated with both attendance and the number of teams? 
 
-DESCRIBE YOUR RESULTS HERE
+DESCRIBE YOUR RESULTS HERE: It appears that attendance and number of teams have a positive correlation with the year. Therefore, over time, the FIFA World Cup has grown in popularity.
 
 ```{r}
-### use this chunk to make a plot illustrating your question
+ggplot(worldcups, aes(sample = attendance)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
+
+ggplot(worldcups, aes(sample = teams)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
 ```
 
 ```{r}
 ### use this chunk to conduct a statistical test to answer your question
+lm(year ~ attendance + teams, data = worldcups) %>% tidy()
 ```
 
 **Rinse and repeat for another 9 questions**
 
+#### Question #2: Is the number of games associated with the number of teams?
+
+DESCRIBE YOUR RESULTS HERE: The number of games has a significant positive correlation with the number of teams. This result is expected because more teams would mean there would have to be more matches. 
+
+```{r}
+ggplot(worldcups, aes(x = teams, y = games)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Number of Teams", y = "Number of Games") +
+  theme_minimal()
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+cor.test(worldcups$teams, worldcups$games) %>% tidy()
+```
+
+#### Question #3: Does attendance increase with the number of games played? 
+
+DESCRIBE YOUR RESULTS HERE: Attendance seems to have a positive correlation with the number of games played. 
+
+```{r}
+ggplot(worldcups, aes(x = games, y = attendance)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Number of Games", y = "Total Attendance") +
+  theme_minimal()
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+lm(attendance ~ games, data = worldcups) %>% tidy()
+```
+
+#### Question #4: Is the number of goals scored related to attendance? 
+
+DESCRIBE YOUR RESULTS HERE: There is a significant positive correlation between goals scored and attendance. This means that tournaments that have more people tend to have more goals scored during the game. 
+
+```{r}
+ggplot(worldcups, aes(x = goals_scored, y = attendance)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Goals Scored", y = "Total Attendance") +
+  theme_minimal()
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+cor.test(worldcups$goals_scored, worldcups$attendance) %>% tidy()
+```
+
+#### Question #5: Do World Cups hosted by South American countries have a higher attendance than other countries? 
+
+DESCRIBE YOUR RESULTS HERE: There is no statistically significant difference in average attendance between South American-hosted World Cups and those hosted in other countries. The mean attendance is higher in other regions, but the difference is not significant. 
+
+```{r}
+worldcups <- worldcups %>%
+  mutate(host_region = ifelse(
+  host == "Brazil" | host == "Uruguay" | host == "Argentina" | host == "Chile",
+  "South America", "Other" ))
+
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+t.test(attendance ~ host_region, data = worldcups)
+```
+
+#### Question #6: Does average goals scored per game change by decade? 
+
+DESCRIBE YOUR RESULTS HERE: There is a statistically significant difference in average goals scored per game across decades. World Cups from the earlier decades, such as the 1930s and 1950s, had more goals scored per game compared to the later decades. 
+
+```{r}
+worldcups <- worldcups %>%
+  mutate(decade = floor(year / 10) * 10)
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+aov_result <- aov(goals_scored / games ~ factor(decade), data = worldcups)
+summary(aov_result)
+
+ggplot(worldcups, aes(x = factor(decade), y = goals_scored / games)) +
+geom_boxplot(fill = "lightgreen") +
+labs(x = "Decade", y = "Goals per Game", title = "Goals per Game by Decade") +
+theme_classic()
+
+```
+
+#### Question #7: Is there a correlation between the country that hosts the World Cup and the winner? 
+
+DESCRIBE YOUR RESULTS HERE: There is not a statistically significant correlation between the country that hosts the World Cup and the winning country.
+
+```{r}
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+chisq.test(worldcups$host, worldcups$winner)
+```
+
+#### Question #8: Do tournaments held in Europe have a higher average amount of teams than tournaments held in other regions? 
+
+DESCRIBE YOUR RESULTS HERE: There is not a statistically significant difference in the amount of teams in World Cups hosted by Europe versus tournaments hosted in other regions. 
+
+```{r}
+worldcups <- worldcups %>%
+  mutate(host_region = ifelse(
+    host %in% c("Italy", "France", "Germany", "England", "Spain", "Switzerland"),"Europe", "Other"))
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+t.test(teams ~ host_region, data = worldcups)
+```
+
+#### Question #8: Is there a correlation between the number of goals scored and which region the tournaments are held in? 
+
+DESCRIBE YOUR RESULTS HERE: There is not a statistically significant correlation between the number of goals scored and where the tournaments were held. 
+
+```{r}
+worldcups <- worldcups %>%
+  mutate(host_region = ifelse(
+    host %in% c("Italy", "France", "Germany", "England", "Spain", "Switzerland"),
+    "Europe",
+    "Other"))
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+t.test(goals_scored ~ host_region, data = worldcups)
+```
+
+#### Question #9: Does the average attendence per game increase over the years? 
+
+DESCRIBE YOUR RESULTS HERE: There is a significant positive correlation between the average attendence per game and the year. On average, attendance per game has increased by about 253 people each year, indicating that the World Cup's popularity has been increasing.  
+
+```{r}
+worldcups <- worldcups %>%
+  mutate(attendance_per_game = attendance / games)
+ggplot(worldcups, aes(sample = attendance_per_game)) +
+  geom_qq() + geom_qq_line() + theme_classic()
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+lm_attendance_per_game_year <- lm(attendance_per_game ~ year, data = worldcups)
+tidy(lm_attendance_per_game_year)
+```
+
+#### Question #10: Does the number of games per team change over the decades?
+
+DESCRIBE YOUR RESULTS HERE: The average number of games played per team has increased over the decades, and this increase is statistically significant. This increase was especially the largest around the 1970s. 
+
+```{r}
+worldcups <- worldcups %>%
+  mutate(decade = floor(year / 10) * 10,
+         games_per_team = games / teams)
+ggplot(worldcups, aes(x = factor(decade), y = games / teams)) +
+  geom_boxplot(fill = "lightpink") +
+  labs(
+    title = "Distribution of Games Played per Team by Decade",
+    x = "Decade",
+    y = "Games per Team"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+### use this chunk to conduct a statistical test to answer your question
+lm_games_per_team_decade <- lm(games_per_team ~ factor(decade), data = worldcups)
+tidy(lm_games_per_team_decade)
+```
+
 ## References
 1. Reference should be for your dataset(s), but if you looked up more information that you included in the introduction, please reference it here as well.
 
-
+TidyTuesday Project. (2022, November 29). FIFA World Cup dataset. Retrieved from https://github.com/rfordatascience/tidytuesday/tree/master/data/2022/2022-11-29. 
 
 <br>
 
