@@ -41,7 +41,7 @@ Read in the table `insurance.tsv` that came along with the homework. This is a d
 
 ```{r}
 ### read the data in here
-
+read_tsv('data/insurance.tsv') -> insurance
 ```
 
 <br>
@@ -54,36 +54,84 @@ For this section, use the given statistical test to answer the question and retu
 
 1. Is age correlated with insurance charges? Use a correlation test.
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is a positive correlation between age and insurance, but it is not a very strong relationship. It is statistically significant.  
 
 ```{r}
 ### Q-Q plot
-
+ggplot(insurance, aes(sample = age)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_classic()
+ggplot(insurance, aes(sample = charges)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_classic()
 ### test
-
+cor.test(insurance$age, insurance$charges) %>% tidy()
 ```
 
 2. Is age associated with both bmi and the number of children an individual has? Use an additive linear model
 
-*TYPE YOUR CONCLUSION HERE*
+*TYPE YOUR CONCLUSION HERE* Age is positively correlated to both bmi and the number of children an individual has. 
 
 ```{r}
 ### Q-Q plot
+ggplot(insurance, aes(sample = age)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
+ 
+ggplot(insurance, aes(sample = bmi)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
 
+ggplot(insurance, aes(sample = children)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
 ### test
-
+lm(age ~ bmi + children, data = insurance) %>% tidy()
 ```
 
 3. Is an interaction between age and bmi associated with higher insurance charges? Use an interactive linear model.
 
 ```{r}
+ggplot(insurance, aes(sample = age)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
 
+ggplot(insurance, aes(sample = bmi)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
+
+ggplot(insurance, aes(sample = charges)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
+### test
+lm(charges ~ age:bmi, data = insurance) %>% tidy()
 ```
 
 4. Reconsidering the question from 3, are there unique interactive and additive effects from age and bmi on insurance charges? Use a single linear model that checks all additive and interaction effects.
 
 ```{r}
+ggplot(insurance, aes(sample = age)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
+ggplot(insurance, aes(sample = bmi)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
+ggplot(insurance, aes(sample = charges)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
 
+lm(charges ~ age*bmi, data = insurance) %>% tidy()
 ```
 
 <br>
@@ -92,10 +140,26 @@ For this section, use the given statistical test to answer the question and retu
 
 5. Using the model you created in question 2, read in the table `new_insurance_data.tsv` and apply your model to it to predict the age of the individuals in the table. How accurate is it?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* It is extremely accurate. For example, one of the accurate ages is 2 and the model predicted 2. 
 
 ```{r}
+read_tsv('data/new_insurance_data.tsv') -> new_insurance_data
 
+lm(age ~ bmi + children, data = insurance) -> model
+new_insurance_data %>%
+  mutate(prediction = predict(model, newdata = new_insurance_data)) -> new_pred
+
+new_pred %>%
+  mutate(diff = prediction - age) %>%
+  summarize(mae = mean(abs(diff)))
+
+# plot
+ggplot(new_pred, aes(x = age, y = prediction)) + 
+  geom_abline(slope = 1, intercept = 0, linetype = 'dashed', color = 'gray60') +
+  geom_point() +
+  coord_cartesian(xlim = c(0,6), ylim = c(0, 6)) +
+  labs(x = 'Actual Age', y = 'Predicted Age') +
+  theme_bw()
 ```
 
 <br>
@@ -109,24 +173,24 @@ In this section you'll create a series of models, report their parameters and th
 6. Report the model parameters for the additive model
 
 ```{r}
-
+lm(charges ~ age + bmi + children, data = insurance) %>% glance()
 ```
 
 7. Report the model parameters for the interaction model
 
 ```{r}
-
+lm(charges ~ age:bmi:children, data = insurance) %>% glance()
 ```
 
 8. Report the model parameters for the combination of additive and interaction effects
 
 ```{r}
-
+lm(charges ~ age*bmi*children, data = insurance) %>% glance()
 ```
 
 9. Which model is best? Support your argument using the model parameters. Also, are these good models? Do they offer a lot of explanatory power for insurance charges?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* The additive model seems to be best because it the most concise and has a high adjusted R^2 value. It's also easier to interpret. 
 
 <br>
 
@@ -136,41 +200,62 @@ For this last section, come up with **three** more questions about the insurance
 
 10. Pick a question to answer with a statistical test. Write down both your question and the test you'll use below.
 
-**Question:** TYPE YOUR QUESTION HERE 
-**Test:** TYPE THE TEST YOU PICKED HERE 
+**Question:** Does the effect of age on insurance charges depend on where a person lives? 
+**Test:** Linear model
 
 Use the chunk below to run your statistical test. What is your conclusion?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* Insurance charges increases with age, but the rate of increase can be greater in certain regions like the northwest and southeast regions.
 
 ```{r}
+ggplot(insurance, aes(x = age, y = charges, color = region)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal() +
+  labs(title = "Charges vs Age by Region")
 
+lm(charges ~ age * region, data = insurance) %>% tidy()
 ```
 
 11. Pick a question to answer with a statistical test. Write down both your question and the test you'll use below.
 
-**Question:** TYPE YOUR QUESTION HERE 
-**Test:** TYPE THE TEST YOU PICKED HERE 
+**Question:** Does smoking status have a significant effect on insurance charges? 
+**Test:** Linear model
 
 Use the chunk below to run your statistical test. What is your conclusion?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* Smoking status does have a statistically significant effect on insurance charges. Smokers are charged approximately $23,000 more than non-smokers. 
 
 ```{r}
+ggplot(insurance, aes(sample = charges)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
 
+model <- lm(charges ~ smoker, data = insurance)
+summary(model)
+
+tidy(model)
 ```
 
 12. Pick a question to answer with a statistical test. Write down both your question and the test you'll use below.
 
-**Question:** TYPE YOUR QUESTION HERE 
-**Test:** TYPE THE TEST YOU PICKED HERE 
+**Question:** Is there a correlation between the number of children a person has and the insurance charge? 
+**Test:** Linear model
 
 Use the chunk below to run your statistical test. What is your conclusion?
 
-*TYPE YOUR CONCLUSION HERE* 
+*TYPE YOUR CONCLUSION HERE* There is a significant positive correlation between the number of children a person has and their insurance charge. For each child, the insurance charge increases by about $790. 
 
 ```{r}
+ggplot(insurance, aes(sample = charges)) +
+  geom_qq() +
+  geom_qq_line() +
+  theme_minimal()
 
+model_children <- lm(charges ~ children, data = insurance)
+
+tidy(model_children)
 ```
 
 
